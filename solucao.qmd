@@ -11,6 +11,7 @@ author: "Tainá Caroline Kuhn"
 ```{r setup, message=FALSE, warning=FALSE}
 # Escreva seu código aqui para carregar os pacotes e importar os dados.
 library(tidyverse)
+
 library(rio)
 library(readxl)
 graos <- import("graos.csv")

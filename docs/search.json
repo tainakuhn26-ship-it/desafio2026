@@ -4,7 +4,7 @@
     "href": "solucao.html",
     "title": "Solução",
     "section": "",
-    "text": "Carregue os pacotes necessários para a análise.\nImporte os quatro arquivos de dados (laboratorio.xlsx, capsulas.xlsx, graos.csv, mmg.xlsx) para o seu ambiente R.\n\n\n# Escreva seu código aqui para carregar os pacotes e importar os dados.\nlibrary(tidyverse)\nlibrary(rio)\nlibrary(readxl)\ngraos &lt;- import(\"graos.csv\")\ncapsulas &lt;- import(\"capsulas.xlsx\")\nlaboratorio &lt;- import(\"laboratorio.xlsx\")\nmmg &lt;- import(\"mmg.xlsx\")"
+    "text": "Carregue os pacotes necessários para a análise.\nImporte os quatro arquivos de dados (laboratorio.xlsx, capsulas.xlsx, graos.csv, mmg.xlsx) para o seu ambiente R.\n\n\n# Escreva seu código aqui para carregar os pacotes e importar os dados.\nlibrary(tidyverse)\n\nlibrary(rio)\nlibrary(readxl)\ngraos &lt;- import(\"graos.csv\")\ncapsulas &lt;- import(\"capsulas.xlsx\")\nlaboratorio &lt;- import(\"laboratorio.xlsx\")\nmmg &lt;- import(\"mmg.xlsx\")"
   },
   {
     "objectID": "solucao.html#pergunta-2-diferença-de-altura-ap-entre-tipos-de-linhaça-tipo-dourada-vs.-marrom",
@@ -46,7 +46,7 @@
     "href": "desafio_2026.html#conclusão",
     "title": "Orientações",
     "section": "Conclusão",
-    "text": "Conclusão\nNesta seção, escreva um breve parágrafo resumindo suas principais descobertas com base nas visualizações que você criou.\n\nO que entregar?\n\nEste arquivo .qmd com todos os blocos de código preenchidos e a sua conclusão.\nO arquivo HTML renderizado a partir do seu .qmd, que mostrará seu código, os resultados e os gráficos."
+    "text": "Conclusão\nNesta seção, escreva um breve parágrafo resumindo suas principais descobertas com base nas visualizações que você criou.\n\nO que entregar?\n\nEste arquivo .qmd com todos os blocos de código preenchidos e a sua conclusão.\nO arquivo HTML renderizado a partir do seu .qmd, que mostrará seu código, os resultados e os gráficos.\n\n#Teste"
   },
   {
     "objectID": "about.html",
