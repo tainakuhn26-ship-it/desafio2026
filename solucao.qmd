@@ -1,0 +1,241 @@
+---
+title: "Solução"
+author: "Tainá Caroline Kuhn"
+---
+
+### 1. Preparação do Ambiente
+
+- Carregue os pacotes necessários para a análise.
+- Importe os quatro arquivos de dados (`laboratorio.xlsx`, `capsulas.xlsx`, `graos.csv`, `mmg.xlsx`) para o seu ambiente R.
+
+```{r setup, message=FALSE, warning=FALSE}
+# Escreva seu código aqui para carregar os pacotes e importar os dados.
+library(tidyverse)
+library(rio)
+library(readxl)
+graos <- import("graos.csv")
+capsulas <- import("capsulas.xlsx")
+laboratorio <- import("laboratorio.xlsx")
+mmg <- import("mmg.xlsx")
+```
+
+### 2. Análise e Consolidação por Planta
+
+O objetivo desta etapa é criar um único data frame que contenha todas as informações para cada planta (`img`).
+
+- **Para o arquivo `graos`:** Calcule o **número total de grãos (NG)**, o **comprimento médio (CG)** e a **largura média (LG)** para cada planta.
+- **Para o arquivo `capsulas`:** Calcule o **número total de cápsulas (NC)** para cada planta.
+- **Extração do ID:** Note que nos arquivos de imagem, a identificação da planta é um número no início da coluna `img` (ex: `"100_Cápsulas_..."`). Você precisará extrair este número para poder vincular os dados aos do arquivo `laboratorio`.
+- **Unificação:** Junte as estatísticas calculadas (NG, CG, LG, NC) ao data frame principal `laboratorio`. O resultado deve ser uma tabela onde cada linha corresponde a uma planta (`img`) com todas as suas variáveis.
+
+```{r processamento_por_planta}
+# Crie os blocos de código necessários para processar os dados de grãos, 
+# cápsulas e depois uni-los aos dados de laboratório.
+
+
+# Processar o arquivo 'graos'
+graos_resumido <- graos |>
+  mutate(img_id = parse_number(img)) |> 
+  group_by(img_id) |>
+  summarise(
+    NG = n(),                            # Número total de grãos (NG)
+    CG = mean(length, na.rm = TRUE),     # Comprimento médio (CG)
+    LG = mean(width, na.rm = TRUE)       # Largura média (LG)
+  )
+
+# Processar o arquivo 'capsulas'
+capsulas_resumido <- capsulas |>
+  mutate(img_id = parse_number(img)) |> 
+  group_by(img_id) |>
+  summarise(
+    NC = n()                             # Número total de cápsulas (NC)
+  )
+
+# Unir os dados calculados com o data frame 'laboratorio' e criar o resultado final
+laboratorio <- 
+  laboratorio |>
+  mutate(img_id = parse_number(as.character(IMG))) |> 
+  left_join(graos_resumido, by = "img_id") |>
+  left_join(capsulas_resumido, by = "img_id")
+
+```
+
+### 3. Análise e Consolidação por Genótipo
+
+Com os dados consolidados por planta, o próximo passo é agregar as informações para obter um resumo por genótipo.
+
+- **Agregação:** Calcule a **média** de todas as variáveis numéricas (altura da planta, número de grãos, etc.) para cada genótipo (`GEN`).
+- **Junção Final:** Adicione a informação de massa de mil grãos (`mmg`) do arquivo `mmg` ao seu data frame de genótipos.
+- **Resultado Final:** O produto desta etapa deve ser um data frame limpo e organizado, onde **cada linha representa um genótipo** e as colunas representam as médias de suas características.
+
+```{r processamento_por_genotipo}
+# Escreva seu código aqui para agrupar os dados por genótipo,
+# calcular as médias e juntar com os dados de massa de mil grãos.
+
+
+# Agrupar os dados consolidados por genótipo e calcular a média das variáveis numéricas
+genotipos_resumido <- laboratorio |> 
+  group_by(GEN) |> 
+  summarise(
+    across(
+      where(is.numeric) & !any_of("img_id"), 
+      \(x) mean(x, na.rm = TRUE)
+    )
+  )
+
+# Adicionar a massa de mil grãos (mmg) ao data frame de genótipos
+resultado_genotipos <- genotipos_resumido |> 
+  left_join(mmg, by = "GEN") |> 
+  # Converter GEN em fator ordenado numericamente pelo número após o 'G'
+  mutate(
+    GEN = fct_reorder(GEN, parse_number(GEN))
+  ) |> 
+  # Reordenar as linhas do data frame de acordo com o fator criado (G1, G2, ..., G10, etc.)
+  arrange(GEN)
+
+# Visualizar o resultado ordenado corretamente
+head(resultado_genotipos)
+
+
+```
+
+
+### 4. Exploração e Visualização
+
+Agora que você tem um dataset final consolidado por genótipo, crie **pelo menos duas visualizações** diferentes para explorar os dados. O objetivo é investigar possíveis relações entre as variáveis e comparar o desempenho dos genótipos.
+
+- Perguntas que você deve responder:
+  - Como a altura da planta se relaciona com o número de cápsulas?
+  - Há indícios de que genótipos do tipo "DOURADA" e "MARROM" diferem em relação à altura de planta?
+  - Quais os top 5 genótipos para produção de grãos (MG) de cada tipo de linhaça?
+  - Calcule o diferencial de seleção, ou seja, a diferença da média geral e a média dos top 5 genótipos, para cada tipo de linhaça, representando os valores em um gráfico de barras
+  
+```{r}
+# Gráfico de Dispersão: Altura da Planta vs. Número de Cápsulas
+ggplot(resultado_genotipos, aes(x = AP, y = NC)) +
+  geom_point(alpha = 0.7, color = "darkgreen", size = 2.5) +
+  geom_smooth(method = "lm", se = TRUE, color = "firebrick", linetype = "dashed") +
+  labs(
+    title = "Relação entre Altura da Planta e Número de Cápsulas por Genótipo",
+    x = "Altura Média da Planta (AP)",
+    y = "Número Médio de Cápsulas (NC)"
+  ) +
+  theme_minimal()
+
+
+
+```
+## Pergunta 2: Diferença de Altura (`AP`) entre Tipos de Linhaça (`TIPO`: DOURADA vs. MARROM)
+
+**Melhor opção de gráfico:** *Boxplot* combinado com os pontos dos dados (*jitter*). O *boxplot* mostra a mediana e quartis de cada tipo, enquanto os pontos revelam a distribuição real dos genótipos.
+
+> **Nota:** Como o agrupamento final da Etapa 3 foi feito por genótipo (`GEN`), precisamos garantir que a coluna `TIPO` esteja presente em `resultado_genotipos`. Se não esteve no `summarise`, podemos recuperá-la associando o tipo ao genótipo a partir da tabela `laboratorio`.
+
+```{r}
+# Garantir que a variável TIPO esteja no data frame de genótipos (caso não tenha vindo no summarise)
+if (!"TIPO" %in% names(resultado_genotipos)) {
+  tipo_por_gen <- laboratorio |> 
+    distinct(GEN, TIPO)
+  
+  resultado_genotipos <- resultado_genotipos |> 
+    left_join(tipo_por_gen, by = "GEN")
+}
+
+# Boxplot + Jitter: Comparação da Altura entre DOURADA e MARROM
+ggplot(resultado_genotipos, aes(x = TIPO, y = AP, fill = TIPO)) +
+  geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+  geom_jitter(width = 0.15, alpha = 0.5, size = 2) +
+  scale_fill_manual(values = c("DOURADA" = "gold", "MARROM" = "saddlebrown")) +
+  labs(
+    title = "Comparação da Altura da Planta por Tipo de Linhaça",
+    x = "Tipo de Linhaça",
+    y = "Altura Média da Planta (AP)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")  
+
+
+```
+
+
+### Pergunta 3: Top 5 Genótipos para Produção de Grãos (`MG`) por Tipo de Linhaça
+
+**Melhor opção:** Filtrar os 5 maiores genótipos de cada categoria (`DOURADA` e `MARROM`) e apresentar em um gráfico de barras horizontais facetado.
+
+```{r top5_genotipos_mg}
+# Identificar os Top 5 genótipos de cada TIPO com base na produção de grãos (MG)
+top5_mg <- resultado_genotipos |> 
+  group_by(TIPO) |> 
+  slice_max(order_by = MG, n = 5) |> 
+  ungroup()
+
+# Visualizar a tabela dos Top 5 no relatório
+print(top5_mg |> select(TIPO, GEN, MG))
+
+#  Gráfico de barras horizontais para os Top 5 por Tipo
+ggplot(top5_mg, aes(x = reorder(GEN, MG), y = MG, fill = TIPO)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  facet_wrap(~ TIPO, scales = "free_y") +
+  scale_fill_manual(values = c("DOURADA" = "goldenrod", "MARROM" = "sienna")) +
+  labs(
+    title = "Top 5 Genótipos para Produção de Grãos (MG) por Tipo",
+    x = "Genótipo",
+    y = "Massa Média de Grãos (MG)"
+  ) +
+  theme_minimal()
+
+
+```
+
+
+### Pergunta 4: Cálculo do Diferencial de Seleção (DS) e Gráfico de Barras
+
+**Conceito:** $DS = \text{Média dos Top 5} - \text{Média Geral}$ (calculado separadamente para cada tipo de linhaça na variável `MG`).
+
+**Melhor opção de gráfico:** Gráfico de barras simples comparando o valor do Diferencial de Seleção entre o tipo `DOURADA` e `MARROM`.
+
+
+```{r diferencial_selecao}
+# Calcular a Média Geral por TIPO
+media_geral <- resultado_genotipos |> 
+  group_by(TIPO) |> 
+  summarise(media_geral_MG = mean(MG, na.rm = TRUE))
+
+# Calcular a Média dos Top 5 por TIPO
+media_top5 <- top5_mg |> 
+  group_by(TIPO) |> 
+  summarise(media_top5_MG = mean(MG, na.rm = TRUE))
+
+# Unir e calcular o Diferencial de Seleção (DS)
+diferencial_selecao <- media_geral |> 
+  left_join(media_top5, by = "TIPO") |> 
+  mutate(DS = media_top5_MG - media_geral_MG)
+
+# Exibir a tabela com os cálculos no Quarto
+print(diferencial_selecao)
+
+# Gráfico de Barras do Diferencial de Seleção por Tipo
+ggplot(diferencial_selecao, aes(x = TIPO, y = DS, fill = TIPO)) +
+  geom_col(width = 0.5, alpha = 0.85) +
+  geom_text(aes(label = round(DS, 2)), vjust = -0.5, fontface = "bold") +
+  scale_fill_manual(values = c("DOURADA" = "gold3", "MARROM" = "chocolate4")) +
+  labs(
+    title = "Diferencial de Seleção (DS) para Produção de Grãos (MG)",
+    subtitle = "Diferença entre a média dos Top 5 genótipos e a média geral",
+    x = "Tipo de Linhaça",
+    y = "Diferencial de Seleção (DS)"
+  ) +
+  ylim(0, max(diferencial_selecao$DS) * 1.2) + # Espaço para o texto do valor no topo da barra
+  theme_minimal() +
+  theme(legend.position = "none")
+
+```
+
+
+
+## Conclusão
+
+Nesta seção, escreva um breve parágrafo resumindo suas principais descobertas com base nas visualizações que você criou.
+
+*(Escreva sua conclusão aqui)*

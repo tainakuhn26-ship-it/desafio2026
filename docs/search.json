@@ -1,0 +1,65 @@
+[
+  {
+    "objectID": "solucao.html",
+    "href": "solucao.html",
+    "title": "Solução",
+    "section": "",
+    "text": "Carregue os pacotes necessários para a análise.\nImporte os quatro arquivos de dados (laboratorio.xlsx, capsulas.xlsx, graos.csv, mmg.xlsx) para o seu ambiente R.\n\n\n# Escreva seu código aqui para carregar os pacotes e importar os dados.\nlibrary(tidyverse)\nlibrary(rio)\nlibrary(readxl)\ngraos &lt;- import(\"graos.csv\")\ncapsulas &lt;- import(\"capsulas.xlsx\")\nlaboratorio &lt;- import(\"laboratorio.xlsx\")\nmmg &lt;- import(\"mmg.xlsx\")"
+  },
+  {
+    "objectID": "solucao.html#pergunta-2-diferença-de-altura-ap-entre-tipos-de-linhaça-tipo-dourada-vs.-marrom",
+    "href": "solucao.html#pergunta-2-diferença-de-altura-ap-entre-tipos-de-linhaça-tipo-dourada-vs.-marrom",
+    "title": "Solução",
+    "section": "Pergunta 2: Diferença de Altura (AP) entre Tipos de Linhaça (TIPO: DOURADA vs. MARROM)",
+    "text": "Pergunta 2: Diferença de Altura (AP) entre Tipos de Linhaça (TIPO: DOURADA vs. MARROM)\nMelhor opção de gráfico: Boxplot combinado com os pontos dos dados (jitter). O boxplot mostra a mediana e quartis de cada tipo, enquanto os pontos revelam a distribuição real dos genótipos.\n\nNota: Como o agrupamento final da Etapa 3 foi feito por genótipo (GEN), precisamos garantir que a coluna TIPO esteja presente em resultado_genotipos. Se não esteve no summarise, podemos recuperá-la associando o tipo ao genótipo a partir da tabela laboratorio.\n\n\n# Garantir que a variável TIPO esteja no data frame de genótipos (caso não tenha vindo no summarise)\nif (!\"TIPO\" %in% names(resultado_genotipos)) {\n  tipo_por_gen &lt;- laboratorio |&gt; \n    distinct(GEN, TIPO)\n  \n  resultado_genotipos &lt;- resultado_genotipos |&gt; \n    left_join(tipo_por_gen, by = \"GEN\")\n}\n\n# Boxplot + Jitter: Comparação da Altura entre DOURADA e MARROM\nggplot(resultado_genotipos, aes(x = TIPO, y = AP, fill = TIPO)) +\n  geom_boxplot(alpha = 0.6, outlier.shape = NA) +\n  geom_jitter(width = 0.15, alpha = 0.5, size = 2) +\n  scale_fill_manual(values = c(\"DOURADA\" = \"gold\", \"MARROM\" = \"saddlebrown\")) +\n  labs(\n    title = \"Comparação da Altura da Planta por Tipo de Linhaça\",\n    x = \"Tipo de Linhaça\",\n    y = \"Altura Média da Planta (AP)\"\n  ) +\n  theme_minimal() +\n  theme(legend.position = \"none\")  \n\nWarning: Removed 27 rows containing non-finite outside the scale range\n(`stat_boxplot()`).\n\n\nWarning: Removed 27 rows containing missing values or values outside the scale range\n(`geom_point()`).\n\n\n\n\n\n\n\n\n\n\nPergunta 3: Top 5 Genótipos para Produção de Grãos (MG) por Tipo de Linhaça\nMelhor opção: Filtrar os 5 maiores genótipos de cada categoria (DOURADA e MARROM) e apresentar em um gráfico de barras horizontais facetado.\n\n# Identificar os Top 5 genótipos de cada TIPO com base na produção de grãos (MG)\ntop5_mg &lt;- resultado_genotipos |&gt; \n  group_by(TIPO) |&gt; \n  slice_max(order_by = MG, n = 5) |&gt; \n  ungroup()\n\n# Visualizar a tabela dos Top 5 no relatório\nprint(top5_mg |&gt; select(TIPO, GEN, MG))\n\n# A tibble: 10 × 3\n   TIPO    GEN      MG\n   &lt;chr&gt;   &lt;fct&gt; &lt;dbl&gt;\n 1 DOURADA G5     5.28\n 2 DOURADA G56    5.09\n 3 DOURADA G23    3.89\n 4 DOURADA G18    3.68\n 5 DOURADA G1     3.59\n 6 MARROM  G4     7.04\n 7 MARROM  G2     6.32\n 8 MARROM  G223   5.83\n 9 MARROM  G63    5.01\n10 MARROM  G12    4.94\n\n#  Gráfico de barras horizontais para os Top 5 por Tipo\nggplot(top5_mg, aes(x = reorder(GEN, MG), y = MG, fill = TIPO)) +\n  geom_col(show.legend = FALSE) +\n  coord_flip() +\n  facet_wrap(~ TIPO, scales = \"free_y\") +\n  scale_fill_manual(values = c(\"DOURADA\" = \"goldenrod\", \"MARROM\" = \"sienna\")) +\n  labs(\n    title = \"Top 5 Genótipos para Produção de Grãos (MG) por Tipo\",\n    x = \"Genótipo\",\n    y = \"Massa Média de Grãos (MG)\"\n  ) +\n  theme_minimal()\n\n\n\n\n\n\n\n\n\n\nPergunta 4: Cálculo do Diferencial de Seleção (DS) e Gráfico de Barras\nConceito: \\(DS = \\text{Média dos Top 5} - \\text{Média Geral}\\) (calculado separadamente para cada tipo de linhaça na variável MG).\nMelhor opção de gráfico: Gráfico de barras simples comparando o valor do Diferencial de Seleção entre o tipo DOURADA e MARROM.\n\n# Calcular a Média Geral por TIPO\nmedia_geral &lt;- resultado_genotipos |&gt; \n  group_by(TIPO) |&gt; \n  summarise(media_geral_MG = mean(MG, na.rm = TRUE))\n\n# Calcular a Média dos Top 5 por TIPO\nmedia_top5 &lt;- top5_mg |&gt; \n  group_by(TIPO) |&gt; \n  summarise(media_top5_MG = mean(MG, na.rm = TRUE))\n\n# Unir e calcular o Diferencial de Seleção (DS)\ndiferencial_selecao &lt;- media_geral |&gt; \n  left_join(media_top5, by = \"TIPO\") |&gt; \n  mutate(DS = media_top5_MG - media_geral_MG)\n\n# Exibir a tabela com os cálculos no Quarto\nprint(diferencial_selecao)\n\n# A tibble: 2 × 4\n  TIPO    media_geral_MG media_top5_MG    DS\n  &lt;chr&gt;            &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;\n1 DOURADA           2.13          4.31  2.18\n2 MARROM            2.31          5.83  3.52\n\n# Gráfico de Barras do Diferencial de Seleção por Tipo\nggplot(diferencial_selecao, aes(x = TIPO, y = DS, fill = TIPO)) +\n  geom_col(width = 0.5, alpha = 0.85) +\n  geom_text(aes(label = round(DS, 2)), vjust = -0.5, fontface = \"bold\") +\n  scale_fill_manual(values = c(\"DOURADA\" = \"gold3\", \"MARROM\" = \"chocolate4\")) +\n  labs(\n    title = \"Diferencial de Seleção (DS) para Produção de Grãos (MG)\",\n    subtitle = \"Diferença entre a média dos Top 5 genótipos e a média geral\",\n    x = \"Tipo de Linhaça\",\n    y = \"Diferencial de Seleção (DS)\"\n  ) +\n  ylim(0, max(diferencial_selecao$DS) * 1.2) + # Espaço para o texto do valor no topo da barra\n  theme_minimal() +\n  theme(legend.position = \"none\")"
+  },
+  {
+    "objectID": "solucao.html#conclusão",
+    "href": "solucao.html#conclusão",
+    "title": "Solução",
+    "section": "Conclusão",
+    "text": "Conclusão\nNesta seção, escreva um breve parágrafo resumindo suas principais descobertas com base nas visualizações que você criou.\n(Escreva sua conclusão aqui)"
+  },
+  {
+    "objectID": "desafio_2026.html#introdução",
+    "href": "desafio_2026.html#introdução",
+    "title": "Orientações",
+    "section": "Introdução",
+    "text": "Introdução\nBem-vindos ao desafio final da disciplina de Introdução ao R! O objetivo deste projeto é aplicar as habilidades de manipulação, transformação e visualização de dados que aprendemos ao longo do curso em um problema real da área de melhoramento de plantas.\n\nContexto do Problema\nNo melhoramento genético da linhaça (linho), pesquisadores avaliam diferentes genótipos (variedades) para selecionar aqueles com as melhores características agronômicas, como produtividade e qualidade dos grãos. Para isso, coletam dados de diversas fontes:\n\nAvaliações em laboratório/campo: Medidas diretas nas plantas, como altura e número de ramificações.\nAnálise de imagens: Fotografias de amostras de cápsulas e grãos são processadas para extrair informações como número, tamanho e forma.\nMedidas de massa: Pesagem de amostras de grãos para estimar o peso médio.\n\nO nosso desafio é atuar como um cientista de dados e integrar todas essas informações para criar um único conjunto de dados consolidado. Este dataset final nos permitirá comparar os genótipos de forma eficiente e extrair insights valiosos.\n\n\nO Desafio\nVocê deverá carregar, limpar, transformar e combinar quatro conjuntos de dados distintos. O objetivo final é gerar uma tabela única onde cada linha representa a média das características de um genótipo, pronta para análises estatísticas e visualizações."
+  },
+  {
+    "objectID": "desafio_2026.html#descrição-dos-dados",
+    "href": "desafio_2026.html#descrição-dos-dados",
+    "title": "Orientações",
+    "section": "Descrição dos Dados",
+    "text": "Descrição dos Dados\nOs quatro arquivos necessários para este desafio são:\n\nlaboratorio.xlsx: Contém dados fenotípicos coletados diretamente das plantas no laboratório.\n\nimg: Identificador único de cada planta.\nTIPO: O tipo de linhaça (DOURADA ou MARROM).\nGEN: O genótipo (variedade) da planta.\nAP, AC, NR, MC, MG: Variáveis agronômicas da planta (altura, etc.).\n\ncapsulas.xlsx: Resultado do processamento de imagens para contagem de cápsulas.\n\nimg: Identificador da imagem, que contém o número do INDIVIDUO.\nCada linha representa uma cápsula detectada na imagem.\n\ngraos.csv: Resultado do processamento de imagens para análise dos grãos.\n\nimg: Identificador da imagem, que contém o número do INDIVIDUO.\nlength, width: Comprimento e largura de cada grão.\nCada linha representa um grão detectado na imagem.\n\nmmg.xlsx: Contém a massa de mil grãos para cada genótipo.\n\nGEN: O genótipo.\nmmg: A massa de mil grãos, uma importante medida de produtividade."
+  },
+  {
+    "objectID": "desafio_2026.html#objetivos-do-desafio",
+    "href": "desafio_2026.html#objetivos-do-desafio",
+    "title": "Orientações",
+    "section": "Objetivos do Desafio",
+    "text": "Objetivos do Desafio\nSeu trabalho é criar um script em R, dentro deste documento Quarto, que realize as seguintes tarefas:\n\n1. Preparação do Ambiente\n\nCarregue os pacotes necessários para a análise.\nImporte os quatro arquivos de dados (laboratorio.xlsx, capsulas.xlsx, graos.csv, mmg.xlsx) para o seu ambiente R.\n\n\n\n2. Análise e Consolidação por Planta\nO objetivo desta etapa é criar um único data frame que contenha todas as informações para cada planta (img).\n\nPara o arquivo graos: Calcule o número total de grãos (NG), o comprimento médio (CG) e a largura média (LG) para cada planta.\nPara o arquivo capsulas: Calcule o número total de cápsulas (NC) para cada planta.\nExtração do ID: Note que nos arquivos de imagem, a identificação da planta é um número no início da coluna img (ex: \"100_Cápsulas_...\"). Você precisará extrair este número para poder vincular os dados aos do arquivo laboratorio.\nUnificação: Junte as estatísticas calculadas (NG, CG, LG, NC) ao data frame principal laboratorio. O resultado deve ser uma tabela onde cada linha corresponde a uma planta (img) com todas as suas variáveis.\n\n\n\n3. Análise e Consolidação por Genótipo\nCom os dados consolidados por planta, o próximo passo é agregar as informações para obter um resumo por genótipo.\n\nAgregação: Calcule a média de todas as variáveis numéricas (altura da planta, número de grãos, etc.) para cada genótipo (GEN).\nJunção Final: Adicione a informação de massa de mil grãos (mmg) do arquivo mmg ao seu data frame de genótipos.\nResultado Final: O produto desta etapa deve ser um data frame limpo e organizado, onde cada linha representa um genótipo e as colunas representam as médias de suas características.\n\n\n\n4. Exploração e Visualização\nAgora que você tem um dataset final consolidado por genótipo, crie pelo menos duas visualizações diferentes para explorar os dados. O objetivo é investigar possíveis relações entre as variáveis e comparar o desempenho dos genótipos.\n\nPerguntas que você deve responder:\n\nComo a altura da planta se relaciona com o número de cápsulas?\nHá indícios de que genótipos do tipo “DOURADA” e “MARROM” diferem em relação à altura de planta?\nQuais os top 5 genótipos para produção de grãos (MG) de cada tipo de linhaça?\nCalcule o diferencial de seleção, ou seja, a diferença da média geral e a média dos top 5 genótipos, para cada tipo de linhaça, representando os valores em um gráfico de barras"
+  },
+  {
+    "objectID": "desafio_2026.html#conclusão",
+    "href": "desafio_2026.html#conclusão",
+    "title": "Orientações",
+    "section": "Conclusão",
+    "text": "Conclusão\nNesta seção, escreva um breve parágrafo resumindo suas principais descobertas com base nas visualizações que você criou.\n\nO que entregar?\n\nEste arquivo .qmd com todos os blocos de código preenchidos e a sua conclusão.\nO arquivo HTML renderizado a partir do seu .qmd, que mostrará seu código, os resultados e os gráficos."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "desafio2026",
+    "section": "",
+    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.\n\n1 + 1\n\n[1] 2"
+  }
+]
