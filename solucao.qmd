@@ -99,7 +99,6 @@ head(resultado_genotipos)
 
 ```
 
-
 ### 4. Exploração e Visualização
 
 Agora que você tem um dataset final consolidado por genótipo, crie **pelo menos duas visualizações** diferentes para explorar os dados. O objetivo é investigar possíveis relações entre as variáveis e comparar o desempenho dos genótipos.
@@ -109,7 +108,7 @@ Agora que você tem um dataset final consolidado por genótipo, crie **pelo meno
   - Há indícios de que genótipos do tipo "DOURADA" e "MARROM" diferem em relação à altura de planta?
   - Quais os top 5 genótipos para produção de grãos (MG) de cada tipo de linhaça?
   - Calcule o diferencial de seleção, ou seja, a diferença da média geral e a média dos top 5 genótipos, para cada tipo de linhaça, representando os valores em um gráfico de barras
-  
+
 ```{r}
 # Gráfico de Dispersão: Altura da Planta vs. Número de Cápsulas
 ggplot(resultado_genotipos, aes(x = AP, y = NC)) +
@@ -125,6 +124,7 @@ ggplot(resultado_genotipos, aes(x = AP, y = NC)) +
 
 
 ```
+
 ## Pergunta 2: Diferença de Altura (`AP`) entre Tipos de Linhaça (`TIPO`: DOURADA vs. MARROM)
 
 **Melhor opção de gráfico:** *Boxplot* combinado com os pontos dos dados (*jitter*). O *boxplot* mostra a mediana e quartis de cada tipo, enquanto os pontos revelam a distribuição real dos genótipos.
@@ -157,7 +157,6 @@ ggplot(resultado_genotipos, aes(x = TIPO, y = AP, fill = TIPO)) +
 
 ```
 
-
 ### Pergunta 3: Top 5 Genótipos para Produção de Grãos (`MG`) por Tipo de Linhaça
 
 **Melhor opção:** Filtrar os 5 maiores genótipos de cada categoria (`DOURADA` e `MARROM`) e apresentar em um gráfico de barras horizontais facetado.
@@ -188,13 +187,11 @@ ggplot(top5_mg, aes(x = reorder(GEN, MG), y = MG, fill = TIPO)) +
 
 ```
 
-
 ### Pergunta 4: Cálculo do Diferencial de Seleção (DS) e Gráfico de Barras
 
 **Conceito:** $DS = \text{Média dos Top 5} - \text{Média Geral}$ (calculado separadamente para cada tipo de linhaça na variável `MG`).
 
 **Melhor opção de gráfico:** Gráfico de barras simples comparando o valor do Diferencial de Seleção entre o tipo `DOURADA` e `MARROM`.
-
 
 ```{r diferencial_selecao}
 # Calcular a Média Geral por TIPO
@@ -231,8 +228,6 @@ ggplot(diferencial_selecao, aes(x = TIPO, y = DS, fill = TIPO)) +
   theme(legend.position = "none")
 
 ```
-
-
 
 ## Conclusão
 
