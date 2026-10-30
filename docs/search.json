@@ -4,14 +4,14 @@
     "href": "solucao.html",
     "title": "Solução",
     "section": "",
-    "text": "Carregue os pacotes necessários para a análise.\nImporte os quatro arquivos de dados (laboratorio.xlsx, capsulas.xlsx, graos.csv, mmg.xlsx) para o seu ambiente R.\n\n\n# Escreva seu código aqui para carregar os pacotes e importar os dados.\nlibrary(tidyverse)\nlibrary(readxl)\nlibrary(gt)\nlibrary(rio)\nlibrary(ggpubr)\nlibrary(ggtext)\nlibrary(ggplot2)\nlibrary(dplyr)\nlibrary(patchwork)\n\ngraos &lt;- import(\"graos.csv\")\ncapsulas &lt;- import(\"capsulas.xlsx\")\nlaboratorio &lt;- import(\"laboratorio.xlsx\")\nmmg &lt;- import(\"mmg.xlsx\")"
+    "text": "Carregue os pacotes necessários para a análise.\nImporte os quatro arquivos de dados (laboratorio.xlsx, capsulas.xlsx, graos.csv, mmg.xlsx) para o seu ambiente R.\n\n\n# Escreva seu código aqui para carregar os pacotes e importar os dados.\nlibrary(tidyverse)\nlibrary(readxl)\nlibrary(gt)\nlibrary(rio)\nlibrary(ggpubr)\nlibrary(ggtext)\nlibrary(ggplot2)\nlibrary(dplyr)\nlibrary(patchwork)\nlibrary(tidyr)\nlibrary(knitr)\nlibrary(kableExtra)\n\ngraos &lt;- import(\"graos.csv\")\ncapsulas &lt;- import(\"capsulas.xlsx\")\nlaboratorio &lt;- import(\"laboratorio.xlsx\")\nmmg &lt;- import(\"mmg.xlsx\")"
   },
   {
     "objectID": "solucao.html#conclusão",
     "href": "solucao.html#conclusão",
     "title": "Solução",
     "section": "Conclusão",
-    "text": "Conclusão\nNesta seção, escreva um breve parágrafo resumindo suas principais descobertas com base nas visualizações que você criou.\n(Escreva sua conclusão aqui)"
+    "text": "Conclusão\nA altura da planta não apresentou relação estatisticamente significativa com o número de cápsulas, indicando ausência de padrão entre essas variáveis. Em contrapartida, a massa de grãos (MG) obteve correlação positiva de alta magnitude e significativa com a massa de cápsulas, número de cápsulas e número de grãos, demonstrando potencial para seleção indireta. Houve diferença significativa para a altura de plantas , sendo os genótipos do tipo marrom mais altos e menos homogêneos do que os do tipo dourada. Por fim, a seleção dos Top 5 genótipos de cada tipo proporcionou expressivos diferenciais de seleção, confirmando o ganho genético na produção de grãos."
   },
   {
     "objectID": "desafio_2026.html#introdução",

@@ -109,36 +109,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
+
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -196,8 +171,6 @@ window.Quarto = {
   <li><a href="#análise-e-consolidação-por-planta" id="toc-análise-e-consolidação-por-planta" class="nav-link" data-scroll-target="#análise-e-consolidação-por-planta">2. Análise e Consolidação por Planta</a></li>
   <li><a href="#análise-e-consolidação-por-genótipo" id="toc-análise-e-consolidação-por-genótipo" class="nav-link" data-scroll-target="#análise-e-consolidação-por-genótipo">3. Análise e Consolidação por Genótipo</a></li>
   <li><a href="#exploração-e-visualização" id="toc-exploração-e-visualização" class="nav-link" data-scroll-target="#exploração-e-visualização">4. Exploração e Visualização</a></li>
-  <li><a href="#pergunta-3-top-5-genótipos-para-produção-de-grãos-mg-por-tipo-de-linhaça" id="toc-pergunta-3-top-5-genótipos-para-produção-de-grãos-mg-por-tipo-de-linhaça" class="nav-link" data-scroll-target="#pergunta-3-top-5-genótipos-para-produção-de-grãos-mg-por-tipo-de-linhaça">Pergunta 3: Top 5 Genótipos para Produção de Grãos (<code>MG</code>) por Tipo de Linhaça</a></li>
-  <li><a href="#pergunta-4-cálculo-do-diferencial-de-seleção-ds-e-gráfico-de-barras" id="toc-pergunta-4-cálculo-do-diferencial-de-seleção-ds-e-gráfico-de-barras" class="nav-link" data-scroll-target="#pergunta-4-cálculo-do-diferencial-de-seleção-ds-e-gráfico-de-barras">Pergunta 4: Cálculo do Diferencial de Seleção (DS) e Gráfico de Barras</a></li>
   <li><a href="#conclusão" id="toc-conclusão" class="nav-link" data-scroll-target="#conclusão">Conclusão</a></li>
   </ul>
 </nav>
@@ -247,11 +220,14 @@ window.Quarto = {
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>graos <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"graos.csv"</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>capsulas <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"capsulas.xlsx"</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>laboratorio <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"laboratorio.xlsx"</span>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>mmg <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"mmg.xlsx"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>graos <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"graos.csv"</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>capsulas <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"capsulas.xlsx"</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>laboratorio <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"laboratorio.xlsx"</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>mmg <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"mmg.xlsx"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="análise-e-consolidação-por-planta" class="level3">
@@ -320,23 +296,23 @@ window.Quarto = {
 <span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    <span class="at">data_row.padding =</span> <span class="fu">px</span>(<span class="dv">3</span>) <span class="co"># &lt;--- REDUZ A ALTURA/ESPAÇAMENTO DAS LINHAS</span></span>
 <span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="icxrqueorx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#icxrqueorx table {
+<div id="mmbhzztwiy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#mmbhzztwiy table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#icxrqueorx thead, #icxrqueorx tbody, #icxrqueorx tfoot, #icxrqueorx tr, #icxrqueorx td, #icxrqueorx th {
+#mmbhzztwiy thead, #mmbhzztwiy tbody, #mmbhzztwiy tfoot, #mmbhzztwiy tr, #mmbhzztwiy td, #mmbhzztwiy th {
   border-style: none;
 }
 
-#icxrqueorx p {
+#mmbhzztwiy p {
   margin: 0;
   padding: 0;
 }
 
-#icxrqueorx .gt_table {
+#mmbhzztwiy .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -362,12 +338,12 @@ window.Quarto = {
   border-left-color: #D3D3D3;
 }
 
-#icxrqueorx .gt_caption {
+#mmbhzztwiy .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#icxrqueorx .gt_title {
+#mmbhzztwiy .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -379,7 +355,7 @@ window.Quarto = {
   border-bottom-width: 0;
 }
 
-#icxrqueorx .gt_subtitle {
+#mmbhzztwiy .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -391,7 +367,7 @@ window.Quarto = {
   border-top-width: 0;
 }
 
-#icxrqueorx .gt_heading {
+#mmbhzztwiy .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -403,13 +379,13 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#icxrqueorx .gt_bottom_border {
+#mmbhzztwiy .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
 }
 
-#icxrqueorx .gt_col_headings {
+#mmbhzztwiy .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -424,7 +400,7 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#icxrqueorx .gt_col_heading {
+#mmbhzztwiy .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -444,7 +420,7 @@ window.Quarto = {
   overflow-x: hidden;
 }
 
-#icxrqueorx .gt_column_spanner_outer {
+#mmbhzztwiy .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -456,15 +432,15 @@ window.Quarto = {
   padding-right: 4px;
 }
 
-#icxrqueorx .gt_column_spanner_outer:first-child {
+#mmbhzztwiy .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#icxrqueorx .gt_column_spanner_outer:last-child {
+#mmbhzztwiy .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#icxrqueorx .gt_column_spanner {
+#mmbhzztwiy .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
@@ -476,11 +452,11 @@ window.Quarto = {
   width: 100%;
 }
 
-#icxrqueorx .gt_spanner_row {
+#mmbhzztwiy .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#icxrqueorx .gt_group_heading {
+#mmbhzztwiy .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -506,7 +482,7 @@ window.Quarto = {
   text-align: left;
 }
 
-#icxrqueorx .gt_empty_group_heading {
+#mmbhzztwiy .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -521,15 +497,15 @@ window.Quarto = {
   vertical-align: middle;
 }
 
-#icxrqueorx .gt_from_md > :first-child {
+#mmbhzztwiy .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#icxrqueorx .gt_from_md > :last-child {
+#mmbhzztwiy .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#icxrqueorx .gt_row {
+#mmbhzztwiy .gt_row {
   padding-top: 3px;
   padding-bottom: 3px;
   padding-left: 5px;
@@ -548,7 +524,7 @@ window.Quarto = {
   overflow-x: hidden;
 }
 
-#icxrqueorx .gt_stub {
+#mmbhzztwiy .gt_stub {
   color: #FFFFFF;
   background-color: #5F5F5F;
   font-size: 100%;
@@ -561,7 +537,7 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#icxrqueorx .gt_stub_row_group {
+#mmbhzztwiy .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -575,15 +551,15 @@ window.Quarto = {
   vertical-align: top;
 }
 
-#icxrqueorx .gt_row_group_first td {
+#mmbhzztwiy .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#icxrqueorx .gt_row_group_first th {
+#mmbhzztwiy .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#icxrqueorx .gt_summary_row {
+#mmbhzztwiy .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -593,16 +569,16 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#icxrqueorx .gt_first_summary_row {
+#mmbhzztwiy .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #5F5F5F;
 }
 
-#icxrqueorx .gt_first_summary_row.thick {
+#mmbhzztwiy .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#icxrqueorx .gt_last_summary_row {
+#mmbhzztwiy .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -612,7 +588,7 @@ window.Quarto = {
   border-bottom-color: #5F5F5F;
 }
 
-#icxrqueorx .gt_grand_summary_row {
+#mmbhzztwiy .gt_grand_summary_row {
   color: #333333;
   background-color: #D5D5D5;
   text-transform: inherit;
@@ -622,7 +598,7 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#icxrqueorx .gt_first_grand_summary_row {
+#mmbhzztwiy .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -632,7 +608,7 @@ window.Quarto = {
   border-top-color: #5F5F5F;
 }
 
-#icxrqueorx .gt_last_grand_summary_row_top {
+#mmbhzztwiy .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -642,11 +618,11 @@ window.Quarto = {
   border-bottom-color: #5F5F5F;
 }
 
-#icxrqueorx .gt_striped {
+#mmbhzztwiy .gt_striped {
   background-color: #F4F4F4;
 }
 
-#icxrqueorx .gt_table_body {
+#mmbhzztwiy .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -655,7 +631,7 @@ window.Quarto = {
   border-bottom-color: #5F5F5F;
 }
 
-#icxrqueorx .gt_footnotes {
+#mmbhzztwiy .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -669,7 +645,7 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#icxrqueorx .gt_footnote {
+#mmbhzztwiy .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -678,7 +654,7 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#icxrqueorx .gt_sourcenotes {
+#mmbhzztwiy .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -692,7 +668,7 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#icxrqueorx .gt_sourcenote {
+#mmbhzztwiy .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -700,72 +676,72 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#icxrqueorx .gt_left {
+#mmbhzztwiy .gt_left {
   text-align: left;
 }
 
-#icxrqueorx .gt_center {
+#mmbhzztwiy .gt_center {
   text-align: center;
 }
 
-#icxrqueorx .gt_right {
+#mmbhzztwiy .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#icxrqueorx .gt_font_normal {
+#mmbhzztwiy .gt_font_normal {
   font-weight: normal;
 }
 
-#icxrqueorx .gt_font_bold {
+#mmbhzztwiy .gt_font_bold {
   font-weight: bold;
 }
 
-#icxrqueorx .gt_font_italic {
+#mmbhzztwiy .gt_font_italic {
   font-style: italic;
 }
 
-#icxrqueorx .gt_super {
+#mmbhzztwiy .gt_super {
   font-size: 65%;
 }
 
-#icxrqueorx .gt_footnote_marks {
+#mmbhzztwiy .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#icxrqueorx .gt_asterisk {
+#mmbhzztwiy .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#icxrqueorx .gt_indent_1 {
+#mmbhzztwiy .gt_indent_1 {
   text-indent: 5px;
 }
 
-#icxrqueorx .gt_indent_2 {
+#mmbhzztwiy .gt_indent_2 {
   text-indent: 10px;
 }
 
-#icxrqueorx .gt_indent_3 {
+#mmbhzztwiy .gt_indent_3 {
   text-indent: 15px;
 }
 
-#icxrqueorx .gt_indent_4 {
+#mmbhzztwiy .gt_indent_4 {
   text-indent: 20px;
 }
 
-#icxrqueorx .gt_indent_5 {
+#mmbhzztwiy .gt_indent_5 {
   text-indent: 25px;
 }
 
-#icxrqueorx .katex-display {
+#mmbhzztwiy .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#icxrqueorx div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#mmbhzztwiy div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1146,23 +1122,23 @@ window.Quarto = {
 <span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a><span class="co"># Exibir a tabela</span></span>
 <span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>tabela_gt</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="ahwoegclrf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#ahwoegclrf table {
+<div id="kaibdffinl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#kaibdffinl table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#ahwoegclrf thead, #ahwoegclrf tbody, #ahwoegclrf tfoot, #ahwoegclrf tr, #ahwoegclrf td, #ahwoegclrf th {
+#kaibdffinl thead, #kaibdffinl tbody, #kaibdffinl tfoot, #kaibdffinl tr, #kaibdffinl td, #kaibdffinl th {
   border-style: none;
 }
 
-#ahwoegclrf p {
+#kaibdffinl p {
   margin: 0;
   padding: 0;
 }
 
-#ahwoegclrf .gt_table {
+#kaibdffinl .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1188,12 +1164,12 @@ window.Quarto = {
   border-left-color: #D3D3D3;
 }
 
-#ahwoegclrf .gt_caption {
+#kaibdffinl .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ahwoegclrf .gt_title {
+#kaibdffinl .gt_title {
   color: #333333;
   font-size: 14px;
   font-weight: initial;
@@ -1205,7 +1181,7 @@ window.Quarto = {
   border-bottom-width: 0;
 }
 
-#ahwoegclrf .gt_subtitle {
+#kaibdffinl .gt_subtitle {
   color: #333333;
   font-size: 11px;
   font-weight: initial;
@@ -1217,7 +1193,7 @@ window.Quarto = {
   border-top-width: 0;
 }
 
-#ahwoegclrf .gt_heading {
+#kaibdffinl .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1229,13 +1205,13 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#ahwoegclrf .gt_bottom_border {
+#kaibdffinl .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
 }
 
-#ahwoegclrf .gt_col_headings {
+#kaibdffinl .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #000000;
@@ -1250,7 +1226,7 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#ahwoegclrf .gt_col_heading {
+#kaibdffinl .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1270,7 +1246,7 @@ window.Quarto = {
   overflow-x: hidden;
 }
 
-#ahwoegclrf .gt_column_spanner_outer {
+#kaibdffinl .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1282,15 +1258,15 @@ window.Quarto = {
   padding-right: 4px;
 }
 
-#ahwoegclrf .gt_column_spanner_outer:first-child {
+#kaibdffinl .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ahwoegclrf .gt_column_spanner_outer:last-child {
+#kaibdffinl .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ahwoegclrf .gt_column_spanner {
+#kaibdffinl .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 1.5px;
   border-bottom-color: #000000;
@@ -1302,11 +1278,11 @@ window.Quarto = {
   width: 100%;
 }
 
-#ahwoegclrf .gt_spanner_row {
+#kaibdffinl .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#ahwoegclrf .gt_group_heading {
+#kaibdffinl .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1332,7 +1308,7 @@ window.Quarto = {
   text-align: left;
 }
 
-#ahwoegclrf .gt_empty_group_heading {
+#kaibdffinl .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1347,15 +1323,15 @@ window.Quarto = {
   vertical-align: middle;
 }
 
-#ahwoegclrf .gt_from_md > :first-child {
+#kaibdffinl .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ahwoegclrf .gt_from_md > :last-child {
+#kaibdffinl .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ahwoegclrf .gt_row {
+#kaibdffinl .gt_row {
   padding-top: 3px;
   padding-bottom: 3px;
   padding-left: 5px;
@@ -1374,7 +1350,7 @@ window.Quarto = {
   overflow-x: hidden;
 }
 
-#ahwoegclrf .gt_stub {
+#kaibdffinl .gt_stub {
   color: #FFFFFF;
   background-color: #5F5F5F;
   font-size: 100%;
@@ -1387,7 +1363,7 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#ahwoegclrf .gt_stub_row_group {
+#kaibdffinl .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1401,15 +1377,15 @@ window.Quarto = {
   vertical-align: top;
 }
 
-#ahwoegclrf .gt_row_group_first td {
+#kaibdffinl .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ahwoegclrf .gt_row_group_first th {
+#kaibdffinl .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#ahwoegclrf .gt_summary_row {
+#kaibdffinl .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1419,16 +1395,16 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#ahwoegclrf .gt_first_summary_row {
+#kaibdffinl .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #5F5F5F;
 }
 
-#ahwoegclrf .gt_first_summary_row.thick {
+#kaibdffinl .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ahwoegclrf .gt_last_summary_row {
+#kaibdffinl .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1438,7 +1414,7 @@ window.Quarto = {
   border-bottom-color: #5F5F5F;
 }
 
-#ahwoegclrf .gt_grand_summary_row {
+#kaibdffinl .gt_grand_summary_row {
   color: #333333;
   background-color: #D5D5D5;
   text-transform: inherit;
@@ -1448,7 +1424,7 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#ahwoegclrf .gt_first_grand_summary_row {
+#kaibdffinl .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1458,7 +1434,7 @@ window.Quarto = {
   border-top-color: #5F5F5F;
 }
 
-#ahwoegclrf .gt_last_grand_summary_row_top {
+#kaibdffinl .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1468,11 +1444,11 @@ window.Quarto = {
   border-bottom-color: #5F5F5F;
 }
 
-#ahwoegclrf .gt_striped {
+#kaibdffinl .gt_striped {
   background-color: #F4F4F4;
 }
 
-#ahwoegclrf .gt_table_body {
+#kaibdffinl .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -1481,7 +1457,7 @@ window.Quarto = {
   border-bottom-color: #5F5F5F;
 }
 
-#ahwoegclrf .gt_footnotes {
+#kaibdffinl .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1495,7 +1471,7 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#ahwoegclrf .gt_footnote {
+#kaibdffinl .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1504,7 +1480,7 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#ahwoegclrf .gt_sourcenotes {
+#kaibdffinl .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1518,7 +1494,7 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#ahwoegclrf .gt_sourcenote {
+#kaibdffinl .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1526,72 +1502,72 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#ahwoegclrf .gt_left {
+#kaibdffinl .gt_left {
   text-align: left;
 }
 
-#ahwoegclrf .gt_center {
+#kaibdffinl .gt_center {
   text-align: center;
 }
 
-#ahwoegclrf .gt_right {
+#kaibdffinl .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ahwoegclrf .gt_font_normal {
+#kaibdffinl .gt_font_normal {
   font-weight: normal;
 }
 
-#ahwoegclrf .gt_font_bold {
+#kaibdffinl .gt_font_bold {
   font-weight: bold;
 }
 
-#ahwoegclrf .gt_font_italic {
+#kaibdffinl .gt_font_italic {
   font-style: italic;
 }
 
-#ahwoegclrf .gt_super {
+#kaibdffinl .gt_super {
   font-size: 65%;
 }
 
-#ahwoegclrf .gt_footnote_marks {
+#kaibdffinl .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#ahwoegclrf .gt_asterisk {
+#kaibdffinl .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ahwoegclrf .gt_indent_1 {
+#kaibdffinl .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ahwoegclrf .gt_indent_2 {
+#kaibdffinl .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ahwoegclrf .gt_indent_3 {
+#kaibdffinl .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ahwoegclrf .gt_indent_4 {
+#kaibdffinl .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ahwoegclrf .gt_indent_5 {
+#kaibdffinl .gt_indent_5 {
   text-indent: 25px;
 }
 
-#ahwoegclrf .katex-display {
+#kaibdffinl .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#ahwoegclrf div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#kaibdffinl div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -3602,32 +3578,28 @@ window.Quarto = {
 </div>
 </div>
 <p>Tendo em vista que um dos objetivos da atividade é a verificação de relação entre variáveis, e que também se objetiva selecionar os genótipos mais produtivos, considerando a massa de grãos (MG), na Figura 2 foram obtidas as correlações entre MG e as demais características analisadas. Conforme os dados obtidos, verifica-se correlação positiva de alta magnitude e estatisticamente significativa entre MG e: MC (massa de cápsulas); NC (número de cápsulas); e NG (número de grãos). Portanto, estas características apresentam potencial para aplicação da seleção indireta visando ao incremento de massa de grãos nos genótipos avaliados.</p>
-<p><strong>Melhor opção de gráfico:</strong> <em>Boxplot</em> combinado com os pontos dos dados (<em>jitter</em>). O <em>boxplot</em> mostra a mediana e quartis de cada tipo, enquanto os pontos revelam a distribuição real dos genótipos.</p>
-<blockquote class="blockquote">
-<p><strong>Nota:</strong> Como o agrupamento final da Etapa 3 foi feito por genótipo (<code>GEN</code>), precisamos garantir que a coluna <code>TIPO</code> esteja presente em <code>resultado_genotipos</code>. Se não esteve no <code>summarise</code>, podemos recuperá-la associando o tipo ao genótipo a partir da tabela <code>laboratorio</code>.</p>
-</blockquote>
+<p><strong>Há indícios de que genótipos do tipo “DOURADA” e “MARROM” diferem em relação à altura de planta?</strong></p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Garantir que a variável TIPO esteja no data frame de genótipos (caso não tenha vindo no summarise)</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="st">"TIPO"</span> <span class="sc">%in%</span> <span class="fu">names</span>(resultado_genotipos)) {</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  tipo_por_gen <span class="ot">&lt;-</span> laboratorio <span class="sc">|&gt;</span> </span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>(GEN, TIPO)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  resultado_genotipos <span class="ot">&lt;-</span> resultado_genotipos <span class="sc">|&gt;</span> </span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(tipo_por_gen, <span class="at">by =</span> <span class="st">"GEN"</span>)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Boxplot + Jitter: Comparação da Altura entre DOURADA e MARROM</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(resultado_genotipos, <span class="fu">aes</span>(<span class="at">x =</span> TIPO, <span class="at">y =</span> AP, <span class="at">fill =</span> TIPO)) <span class="sc">+</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.15</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"DOURADA"</span> <span class="ot">=</span> <span class="st">"gold"</span>, <span class="st">"MARROM"</span> <span class="ot">=</span> <span class="st">"saddlebrown"</span>)) <span class="sc">+</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Comparação da Altura da Planta por Tipo de Linhaça"</span>,</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Tipo de Linhaça"</span>,</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Altura Média da Planta (AP)"</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)  </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Boxplot + Jitter: Comparação da Altura entre DOURADA e MARROM</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(resultado_genotipos, <span class="fu">aes</span>(<span class="at">x =</span> TIPO, <span class="at">y =</span> AP, <span class="at">fill =</span> TIPO)) <span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="fu">aes</span>(<span class="at">color =</span> TIPO), <span class="at">width =</span> <span class="fl">0.15</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"DOURADA"</span> <span class="ot">=</span> <span class="st">"gold"</span>, <span class="st">"MARROM"</span> <span class="ot">=</span> <span class="st">"saddlebrown"</span>)) <span class="sc">+</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"DOURADA"</span> <span class="ot">=</span> <span class="st">"goldenrod3"</span>, <span class="st">"MARROM"</span> <span class="ot">=</span> <span class="st">"sienna4"</span>)) <span class="sc">+</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"&lt;b&gt;Figura 3.&lt;/b&gt; Comparação da Altura da Planta por Tipo de Linhaça"</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Tipo de Linhaça"</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Altura Média da Planta - AP (cm)"</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> ggtext<span class="sc">::</span><span class="fu">element_markdown</span>(</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">face =</span> <span class="st">"plain"</span>,</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> <span class="dv">13</span>,</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">hjust =</span> <span class="dv">0</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"none"</span> <span class="co"># Remove a legenda lateral</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Removed 27 rows containing non-finite outside the scale range
 (`stat_boxplot()`).</code></pre>
@@ -3643,99 +3615,254 @@ window.Quarto = {
 </figure>
 </div>
 </div>
-</div>
-</section>
-<section id="pergunta-3-top-5-genótipos-para-produção-de-grãos-mg-por-tipo-de-linhaça" class="level3">
-<h3 class="anchored" data-anchor-id="pergunta-3-top-5-genótipos-para-produção-de-grãos-mg-por-tipo-de-linhaça">Pergunta 3: Top 5 Genótipos para Produção de Grãos (<code>MG</code>) por Tipo de Linhaça</h3>
-<p><strong>Melhor opção:</strong> Filtrar os 5 maiores genótipos de cada categoria (<code>DOURADA</code> e <code>MARROM</code>) e apresentar em um gráfico de barras horizontais facetado.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Identificar os Top 5 genótipos de cada TIPO com base na produção de grãos (MG)</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>top5_mg <span class="ot">&lt;-</span> resultado_genotipos <span class="sc">|&gt;</span> </span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Obter média, desvio padrão e n de cada grupo</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>resumo_ap <span class="ot">&lt;-</span> resultado_genotipos <span class="sc">|&gt;</span> </span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(TIPO) <span class="sc">|&gt;</span> </span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">order_by =</span> MG, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizar a tabela dos Top 5 no relatório</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(top5_mg <span class="sc">|&gt;</span> <span class="fu">select</span>(TIPO, GEN, MG))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">media =</span> <span class="fu">mean</span>(AP, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">desvio_padrao =</span> <span class="fu">sd</span>(AP, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"--- RESUMO DESCRITIVO ---"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 10 × 3
-   TIPO    GEN      MG
-   &lt;chr&gt;   &lt;fct&gt; &lt;dbl&gt;
- 1 DOURADA G5     5.28
- 2 DOURADA G56    5.09
- 3 DOURADA G23    3.89
- 4 DOURADA G18    3.68
- 5 DOURADA G1     3.59
- 6 MARROM  G4     7.04
- 7 MARROM  G2     6.32
- 8 MARROM  G223   5.83
- 9 MARROM  G63    5.01
-10 MARROM  G12    4.94</code></pre>
+<pre><code>[1] "--- RESUMO DESCRITIVO ---"</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#  Gráfico de barras horizontais para os Top 5 por Tipo</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(top5_mg, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(GEN, MG), <span class="at">y =</span> MG, <span class="at">fill =</span> TIPO)) <span class="sc">+</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> TIPO, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"DOURADA"</span> <span class="ot">=</span> <span class="st">"goldenrod"</span>, <span class="st">"MARROM"</span> <span class="ot">=</span> <span class="st">"sienna"</span>)) <span class="sc">+</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Top 5 Genótipos para Produção de Grãos (MG) por Tipo"</span>,</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Genótipo"</span>,</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Massa Média de Grãos (MG)"</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="solucao_files/figure-html/top5_genotipos_mg-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="pergunta-4-cálculo-do-diferencial-de-seleção-ds-e-gráfico-de-barras" class="level3">
-<h3 class="anchored" data-anchor-id="pergunta-4-cálculo-do-diferencial-de-seleção-ds-e-gráfico-de-barras">Pergunta 4: Cálculo do Diferencial de Seleção (DS) e Gráfico de Barras</h3>
-<p><strong>Conceito:</strong> <span class="math inline">\(DS = \text{Média dos Top 5} - \text{Média Geral}\)</span> (calculado separadamente para cada tipo de linhaça na variável <code>MG</code>).</p>
-<p><strong>Melhor opção de gráfico:</strong> Gráfico de barras simples comparando o valor do Diferencial de Seleção entre o tipo <code>DOURADA</code> e <code>MARROM</code>.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcular a Média Geral por TIPO</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>media_geral <span class="ot">&lt;-</span> resultado_genotipos <span class="sc">|&gt;</span> </span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(TIPO) <span class="sc">|&gt;</span> </span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">media_geral_MG =</span> <span class="fu">mean</span>(MG, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcular a Média dos Top 5 por TIPO</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>media_top5 <span class="ot">&lt;-</span> top5_mg <span class="sc">|&gt;</span> </span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(TIPO) <span class="sc">|&gt;</span> </span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">media_top5_MG =</span> <span class="fu">mean</span>(MG, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Unir e calcular o Diferencial de Seleção (DS)</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>diferencial_selecao <span class="ot">&lt;-</span> media_geral <span class="sc">|&gt;</span> </span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(media_top5, <span class="at">by =</span> <span class="st">"TIPO"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DS =</span> media_top5_MG <span class="sc">-</span> media_geral_MG)</span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Exibir a tabela com os cálculos no Quarto</span></span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(diferencial_selecao)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(resumo_ap)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 4
-  TIPO    media_geral_MG media_top5_MG    DS
-  &lt;chr&gt;            &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;
-1 DOURADA           2.28          4.31  2.03
-2 MARROM            2.20          5.83  3.62</code></pre>
+  TIPO        n media desvio_padrao
+  &lt;chr&gt;   &lt;int&gt; &lt;dbl&gt;         &lt;dbl&gt;
+1 DOURADA    38  77.9          6.53
+2 MARROM     82  88.7         16.9 </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gráfico de Barras do Diferencial de Seleção por Tipo</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(diferencial_selecao, <span class="fu">aes</span>(<span class="at">x =</span> TIPO, <span class="at">y =</span> DS, <span class="at">fill =</span> TIPO)) <span class="sc">+</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">alpha =</span> <span class="fl">0.85</span>) <span class="sc">+</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(DS, <span class="dv">2</span>)), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">fontface =</span> <span class="st">"bold"</span>) <span class="sc">+</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"DOURADA"</span> <span class="ot">=</span> <span class="st">"gold3"</span>, <span class="st">"MARROM"</span> <span class="ot">=</span> <span class="st">"chocolate4"</span>)) <span class="sc">+</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Diferencial de Seleção (DS) para Produção de Grãos (MG)"</span>,</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Diferença entre a média dos Top 5 genótipos e a média geral"</span>,</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Tipo de Linhaça"</span>,</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Diferencial de Seleção (DS)"</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="fu">max</span>(diferencial_selecao<span class="sc">$</span>DS) <span class="sc">*</span> <span class="fl">1.2</span>) <span class="sc">+</span> <span class="co"># Espaço para o texto do valor no topo da barra</span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Teste t de Student (compara a altura média entre DOURADA e MARROM)</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>teste_t <span class="ot">&lt;-</span> <span class="fu">t.test</span>(AP <span class="sc">~</span> TIPO, <span class="at">data =</span> resultado_genotipos)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"--- TESTE T DE STUDENT ---"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "--- TESTE T DE STUDENT ---"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(teste_t)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Welch Two Sample t-test
+
+data:  AP by TIPO
+t = -4.3792, df = 83.944, p-value = 3.416e-05
+alternative hypothesis: true difference in means between group DOURADA and group MARROM is not equal to 0
+95 percent confidence interval:
+ -15.667663  -5.881807
+sample estimates:
+mean in group DOURADA  mean in group MARROM 
+             77.90485              88.67958 </code></pre>
+</div>
+</div>
+<p>Sim, há diferença na alura de plantas entre genótipos do tipo marrom e dourada. Os genótipos do tipo marrom apresentam mediana maior do que as do tipo dourada (Figura 3).</p>
+<p>O teste de comparação de médias indicou uma diferença estatisticamente significativa na altura das plantas entre os dois tipos de linhaça. Os genótipos do tipo marrom apresentaram altura média superior (88.7 cm) em relação aos do tipo dourada (77.9 cm).</p>
+<p>Além disso, o tipo dourado apresenta genótipos com comportamento mais homogêneo em relação à altura se comparados ao genótipos do tipo marrom.</p>
+<p><strong>Quais os top 5 genótipos para produção de grãos (MG) de cada tipo de linhaça?</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Selecionar os Top 5 de cada TIPO e criar a posição (1º ao 5º)</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>top5_dourada <span class="ot">&lt;-</span> resultado_genotipos <span class="sc">|&gt;</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(TIPO <span class="sc">==</span> <span class="st">"DOURADA"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">order_by =</span> MG, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(MG)) <span class="sc">|&gt;</span> </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(Posição <span class="ot">=</span> <span class="fu">paste0</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>(), <span class="st">"º"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Posição, <span class="at">GEN_DOURADA =</span> GEN, <span class="at">MG_DOURADA =</span> MG)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>top5_marrom <span class="ot">&lt;-</span> resultado_genotipos <span class="sc">|&gt;</span> </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(TIPO <span class="sc">==</span> <span class="st">"MARROM"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">order_by =</span> MG, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(MG)) <span class="sc">|&gt;</span> </span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(Posição <span class="ot">=</span> <span class="fu">paste0</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>(), <span class="st">"º"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Posição, <span class="at">GEN_MARROM =</span> GEN, <span class="at">MG_MARROM =</span> MG)</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Unir as duas listas em colunas paralelas</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>tabela_top5_lado_a_lado <span class="ot">&lt;-</span> <span class="fu">left_join</span>(top5_dourada, top5_marrom, <span class="at">by =</span> <span class="st">"Posição"</span>)</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Gerar a Tabela 3 no padrão</span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>  tabela_top5_lado_a_lado,</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">format =</span> <span class="st">"html"</span>,</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">escape =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Posição"</span>, <span class="st">"Genótipo"</span>, <span class="st">"MG (g)"</span>, <span class="st">"Genótipo"</span>, <span class="st">"MG (g)"</span>),</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="fu">c</span>(<span class="st">"c"</span>, <span class="st">"c"</span>, <span class="st">"r"</span>, <span class="st">"c"</span>, <span class="st">"r"</span>),</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">digits =</span> <span class="dv">2</span>,</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"&lt;div style='text-align: center; color: black; border-top: 2px solid black; border-bottom: 2px solid black; padding: 6px 0; margin-bottom: 8px;'&gt;&lt;span style='color: black;'&gt;&lt;b&gt;Tabela 3.&lt;/b&gt; Top 5 genótipos de linhaça mais produtivos para massa de grãos (MG) divididos por tipo&lt;/span&gt;&lt;/div&gt;"</span></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_header_above</span>(<span class="fu">c</span>(<span class="st">" "</span> <span class="ot">=</span> <span class="dv">1</span>, <span class="st">"Tipo Dourada"</span> <span class="ot">=</span> <span class="dv">2</span>, <span class="st">"Tipo Marrom"</span> <span class="ot">=</span> <span class="dv">2</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(</span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>),</span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">full_width =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">position =</span> <span class="st">"center"</span></span>
+<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small">
+<caption><span style="color: black;"><strong>Tabela 3.</strong> Top 5 genótipos de linhaça mais produtivos para massa de grãos (MG) divididos por tipo</span></caption>
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" style="text-align: center; empty-cells: hide; border-bottom: hidden;"></th>
+<th colspan="2" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Tipo Dourada
+</div></th>
+<th colspan="2" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Tipo Marrom
+</div></th>
+</tr>
+<tr class="even">
+<th style="text-align: center;" data-quarto-table-cell-role="th">Posição</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">Genótipo</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">MG (g)</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">Genótipo</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">MG (g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1º</td>
+<td style="text-align: center;">G5</td>
+<td style="text-align: right;">5.28</td>
+<td style="text-align: center;">G4</td>
+<td style="text-align: right;">7.04</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2º</td>
+<td style="text-align: center;">G56</td>
+<td style="text-align: right;">5.09</td>
+<td style="text-align: center;">G2</td>
+<td style="text-align: right;">6.32</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3º</td>
+<td style="text-align: center;">G23</td>
+<td style="text-align: right;">3.89</td>
+<td style="text-align: center;">G223</td>
+<td style="text-align: right;">5.83</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4º</td>
+<td style="text-align: center;">G18</td>
+<td style="text-align: right;">3.68</td>
+<td style="text-align: center;">G63</td>
+<td style="text-align: right;">5.01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">5º</td>
+<td style="text-align: center;">G1</td>
+<td style="text-align: right;">3.59</td>
+<td style="text-align: center;">G12</td>
+<td style="text-align: right;">4.94</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><strong>Calcule o diferencial de seleção, ou seja, a diferença da média geral e a média dos top 5 genótipos, para cada tipo de linhaça, representando os valores em um gráfico de barras.</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reconstruir localmente os Top 5 para garantir autonomia</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>top5_local <span class="ot">&lt;-</span> resultado_genotipos <span class="sc">|&gt;</span> </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(TIPO) <span class="sc">|&gt;</span> </span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">order_by =</span> MG, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcular Média Geral e Média dos Top 5 (desconsiderando NAs)</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>media_geral <span class="ot">&lt;-</span> resultado_genotipos <span class="sc">|&gt;</span> </span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(TIPO) <span class="sc">|&gt;</span> </span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Media_Geral =</span> <span class="fu">mean</span>(MG, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>media_top5 <span class="ot">&lt;-</span> top5_local <span class="sc">|&gt;</span> </span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(TIPO) <span class="sc">|&gt;</span> </span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Media_Top5 =</span> <span class="fu">mean</span>(MG, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Tabela do Diferencial de Seleção (DS = Média Top 5 - Média Geral)</span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>tabela_ds <span class="ot">&lt;-</span> <span class="fu">left_join</span>(media_geral, media_top5, <span class="at">by =</span> <span class="st">"TIPO"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DS =</span> Media_Top5 <span class="sc">-</span> Media_Geral)</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Exibir os resultados do DS em formato de tabela no relatório</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>  tabela_ds,</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">format =</span> <span class="st">"html"</span>,</span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">escape =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Tipo de Linhaça"</span>, <span class="st">"Média Geral (g)"</span>, <span class="st">"Média Top 5 (g)"</span>, <span class="st">"Diferencial de Seleção - DS (g)"</span>),</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="fu">c</span>(<span class="st">"l"</span>, <span class="st">"c"</span>, <span class="st">"c"</span>, <span class="st">"c"</span>),</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">digits =</span> <span class="dv">2</span>,</span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"&lt;div style='text-align: center; color: black; border-top: 2px solid black; border-bottom: 2px solid black; padding: 6px 0; margin-bottom: 8px;'&gt;&lt;span style='color: black;'&gt;&lt;b&gt;Tabela 4.&lt;/b&gt; Diferencial de seleção (DS) para massa de grãos por tipo de linhaça&lt;/span&gt;&lt;/div&gt;"</span></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(</span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>),</span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">full_width =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">position =</span> <span class="st">"center"</span></span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small">
+<caption><span style="color: black;"><strong>Tabela 4.</strong> Diferencial de seleção (DS) para massa de grãos por tipo de linhaça</span></caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Tipo de Linhaça</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">Média Geral (g)</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">Média Top 5 (g)</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">Diferencial de Seleção - DS (g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">DOURADA</td>
+<td style="text-align: center;">2.28</td>
+<td style="text-align: center;">4.31</td>
+<td style="text-align: center;">2.03</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MARROM</td>
+<td style="text-align: center;">2.20</td>
+<td style="text-align: center;">5.83</td>
+<td style="text-align: center;">3.62</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Organizar dados para as 4 barras do gráfico</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>dados_grafico_ds <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  media_geral <span class="sc">|&gt;</span> <span class="fu">rename</span>(<span class="at">Media =</span> Media_Geral) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Grupo =</span> <span class="st">"Média Geral"</span>),</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  media_top5 <span class="sc">|&gt;</span> <span class="fu">rename</span>(<span class="at">Media =</span> Media_Top5) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Grupo =</span> <span class="st">"Média Top 5"</span>)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Grupo =</span> <span class="fu">factor</span>(Grupo, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Média Geral"</span>, <span class="st">"Média Top 5"</span>)),</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">TIPO =</span> <span class="fu">factor</span>(TIPO, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"DOURADA"</span>, <span class="st">"MARROM"</span>))</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Gerar o Gráfico de Barras Comparativo (Figura 4)</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dados_grafico_ds, <span class="fu">aes</span>(<span class="at">x =</span> TIPO, <span class="at">y =</span> Media, <span class="at">fill =</span> Grupo)) <span class="sc">+</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="at">width =</span> <span class="fl">0.7</span>), <span class="at">width =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">sprintf</span>(<span class="st">"%.2f g"</span>, Media)),</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="at">width =</span> <span class="fl">0.7</span>),</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>,</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">3.8</span>,</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">fontface =</span> <span class="st">"bold"</span></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Média Geral"</span> <span class="ot">=</span> <span class="st">"gray60"</span>, <span class="st">"Média Top 5"</span> <span class="ot">=</span> <span class="st">"#2c7fb8"</span>)) <span class="sc">+</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">max</span>(dados_grafico_ds<span class="sc">$</span>Media) <span class="sc">*</span> <span class="fl">1.15</span>)) <span class="sc">+</span></span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"&lt;b&gt;Figura 4.&lt;/b&gt; Comparação entre Média Geral e Média dos Top 5 Genótipos (Diferencial de Seleção)"</span>,</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Tipo de Linhaça"</span>,</span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Massa Média de Grãos - MG (g)"</span>,</span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Grupo"</span></span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> ggtext<span class="sc">::</span><span class="fu">element_markdown</span>(<span class="at">face =</span> <span class="st">"plain"</span>, <span class="at">size =</span> <span class="dv">12</span>, <span class="at">hjust =</span> <span class="dv">0</span>),</span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"top"</span>,</span>
+<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -3747,8 +3874,7 @@ window.Quarto = {
 </section>
 <section id="conclusão" class="level2">
 <h2 class="anchored" data-anchor-id="conclusão">Conclusão</h2>
-<p>Nesta seção, escreva um breve parágrafo resumindo suas principais descobertas com base nas visualizações que você criou.</p>
-<p><em>(Escreva sua conclusão aqui)</em></p>
+<p>A altura da planta não apresentou relação estatisticamente significativa com o número de cápsulas, indicando ausência de padrão entre essas variáveis. Em contrapartida, a massa de grãos (MG) obteve correlação positiva de alta magnitude e significativa com a massa de cápsulas, número de cápsulas e número de grãos, demonstrando potencial para seleção indireta. Houve diferença significativa para a altura de plantas , sendo os genótipos do tipo marrom mais altos e menos homogêneos do que os do tipo dourada. Por fim, a seleção dos Top 5 genótipos de cada tipo proporcionou expressivos diferenciais de seleção, confirmando o ganho genético na produção de grãos.</p>
 
 
 </section>

@@ -19,6 +19,9 @@ library(ggtext)
 library(ggplot2)
 library(dplyr)
 library(patchwork)
+library(tidyr)
+library(knitr)
+library(kableExtra)
 
 graos <- import("graos.csv")
 capsulas <- import("capsulas.xlsx")
@@ -454,110 +457,172 @@ figura2
 
 Tendo em vista que um dos objetivos da atividade é a verificação de relação entre variáveis, e que também se objetiva selecionar os genótipos mais produtivos, considerando a massa de grãos (MG), na Figura 2 foram obtidas as correlações entre MG e as demais características analisadas. Conforme os dados obtidos, verifica-se correlação positiva de alta magnitude e estatisticamente significativa entre MG e: MC (massa de cápsulas); NC (número de cápsulas); e NG (número de grãos). Portanto, estas características apresentam potencial para aplicação da seleção indireta visando ao incremento de massa de grãos nos genótipos avaliados.
 
-**Melhor opção de gráfico:** *Boxplot* combinado com os pontos dos dados (*jitter*). O *boxplot* mostra a mediana e quartis de cada tipo, enquanto os pontos revelam a distribuição real dos genótipos.
-
-> **Nota:** Como o agrupamento final da Etapa 3 foi feito por genótipo (`GEN`), precisamos garantir que a coluna `TIPO` esteja presente em `resultado_genotipos`. Se não esteve no `summarise`, podemos recuperá-la associando o tipo ao genótipo a partir da tabela `laboratorio`.
+**Há indícios de que genótipos do tipo "DOURADA" e "MARROM" diferem em relação à altura de planta?**
 
 ```{r}
-# Garantir que a variável TIPO esteja no data frame de genótipos (caso não tenha vindo no summarise)
-if (!"TIPO" %in% names(resultado_genotipos)) {
-  tipo_por_gen <- laboratorio |> 
-    distinct(GEN, TIPO)
-  
-  resultado_genotipos <- resultado_genotipos |> 
-    left_join(tipo_por_gen, by = "GEN")
-}
-
 # Boxplot + Jitter: Comparação da Altura entre DOURADA e MARROM
 ggplot(resultado_genotipos, aes(x = TIPO, y = AP, fill = TIPO)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +
-  geom_jitter(width = 0.15, alpha = 0.5, size = 2) +
+  geom_jitter(aes(color = TIPO), width = 0.15, alpha = 0.7, size = 2) +
   scale_fill_manual(values = c("DOURADA" = "gold", "MARROM" = "saddlebrown")) +
+  scale_color_manual(values = c("DOURADA" = "goldenrod3", "MARROM" = "sienna4")) +
   labs(
-    title = "Comparação da Altura da Planta por Tipo de Linhaça",
+    title = "<b>Figura 3.</b> Comparação da Altura da Planta por Tipo de Linhaça",
     x = "Tipo de Linhaça",
-    y = "Altura Média da Planta (AP)"
+    y = "Altura Média da Planta - AP (cm)"
   ) +
   theme_minimal() +
-  theme(legend.position = "none")  
+  theme(
+    plot.title = ggtext::element_markdown(
+      face = "plain",
+      size = 13,
+      hjust = 0
+    ),
+    legend.position = "none" # Remove a legenda lateral
+  )
 
+# Obter média, desvio padrão e n de cada grupo
+resumo_ap <- resultado_genotipos |> 
+  group_by(TIPO) |> 
+  summarise(
+    n = n(),
+    media = mean(AP, na.rm = TRUE),
+    desvio_padrao = sd(AP, na.rm = TRUE)
+  )
 
+print("--- RESUMO DESCRITIVO ---")
+print(resumo_ap)
+
+# Teste t de Student (compara a altura média entre DOURADA e MARROM)
+teste_t <- t.test(AP ~ TIPO, data = resultado_genotipos)
+
+print("--- TESTE T DE STUDENT ---")
+print(teste_t)
 ```
 
-### Pergunta 3: Top 5 Genótipos para Produção de Grãos (`MG`) por Tipo de Linhaça
+Sim, há diferença na alura de plantas entre genótipos do tipo marrom e dourada. Os genótipos do tipo marrom apresentam mediana maior do que as do tipo dourada (Figura 3).
 
-**Melhor opção:** Filtrar os 5 maiores genótipos de cada categoria (`DOURADA` e `MARROM`) e apresentar em um gráfico de barras horizontais facetado.
+O teste de comparação de médias indicou uma diferença estatisticamente significativa na altura das plantas entre os dois tipos de linhaça. Os genótipos do tipo marrom apresentaram altura média superior (88.7 cm) em relação aos do tipo dourada (77.9 cm).
+
+Além disso, o tipo dourado apresenta genótipos com comportamento mais homogêneo em relação à altura se comparados ao genótipos do tipo marrom.
+
+**Quais os top 5 genótipos para produção de grãos (MG) de cada tipo de linhaça?**
 
 ```{r top5_genotipos_mg}
-# Identificar os Top 5 genótipos de cada TIPO com base na produção de grãos (MG)
-top5_mg <- resultado_genotipos |> 
+
+# Selecionar os Top 5 de cada TIPO e criar a posição (1º ao 5º)
+top5_dourada <- resultado_genotipos |> 
+  filter(TIPO == "DOURADA") |> 
+  slice_max(order_by = MG, n = 5) |> 
+  arrange(desc(MG)) |> 
+  mutate(Posição = paste0(1:n(), "º")) |> 
+  select(Posição, GEN_DOURADA = GEN, MG_DOURADA = MG)
+
+top5_marrom <- resultado_genotipos |> 
+  filter(TIPO == "MARROM") |> 
+  slice_max(order_by = MG, n = 5) |> 
+  arrange(desc(MG)) |> 
+  mutate(Posição = paste0(1:n(), "º")) |> 
+  select(Posição, GEN_MARROM = GEN, MG_MARROM = MG)
+
+# Unir as duas listas em colunas paralelas
+tabela_top5_lado_a_lado <- left_join(top5_dourada, top5_marrom, by = "Posição")
+
+# Gerar a Tabela 3 no padrão
+kable(
+  tabela_top5_lado_a_lado,
+  format = "html",
+  escape = FALSE,
+  col.names = c("Posição", "Genótipo", "MG (g)", "Genótipo", "MG (g)"),
+  align = c("c", "c", "r", "c", "r"),
+  digits = 2,
+  caption = "<div style='text-align: center; color: black; border-top: 2px solid black; border-bottom: 2px solid black; padding: 6px 0; margin-bottom: 8px;'><span style='color: black;'><b>Tabela 3.</b> Top 5 genótipos de linhaça mais produtivos para massa de grãos (MG) divididos por tipo</span></div>"
+) |> 
+  add_header_above(c(" " = 1, "Tipo Dourada" = 2, "Tipo Marrom" = 2)) |> 
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    position = "center"
+  )
+```
+
+**Calcule o diferencial de seleção, ou seja, a diferença da média geral e a média dos top 5 genótipos, para cada tipo de linhaça, representando os valores em um gráfico de barras.**
+
+```{r diferencial_selecao}
+
+
+# Reconstruir localmente os Top 5 para garantir autonomia
+top5_local <- resultado_genotipos |> 
   group_by(TIPO) |> 
   slice_max(order_by = MG, n = 5) |> 
   ungroup()
 
-# Visualizar a tabela dos Top 5 no relatório
-print(top5_mg |> select(TIPO, GEN, MG))
-
-#  Gráfico de barras horizontais para os Top 5 por Tipo
-ggplot(top5_mg, aes(x = reorder(GEN, MG), y = MG, fill = TIPO)) +
-  geom_col(show.legend = FALSE) +
-  coord_flip() +
-  facet_wrap(~ TIPO, scales = "free_y") +
-  scale_fill_manual(values = c("DOURADA" = "goldenrod", "MARROM" = "sienna")) +
-  labs(
-    title = "Top 5 Genótipos para Produção de Grãos (MG) por Tipo",
-    x = "Genótipo",
-    y = "Massa Média de Grãos (MG)"
-  ) +
-  theme_minimal()
-
-
-```
-
-### Pergunta 4: Cálculo do Diferencial de Seleção (DS) e Gráfico de Barras
-
-**Conceito:** $DS = \text{Média dos Top 5} - \text{Média Geral}$ (calculado separadamente para cada tipo de linhaça na variável `MG`).
-
-**Melhor opção de gráfico:** Gráfico de barras simples comparando o valor do Diferencial de Seleção entre o tipo `DOURADA` e `MARROM`.
-
-```{r diferencial_selecao}
-# Calcular a Média Geral por TIPO
+# Calcular Média Geral e Média dos Top 5 (desconsiderando NAs)
 media_geral <- resultado_genotipos |> 
   group_by(TIPO) |> 
-  summarise(media_geral_MG = mean(MG, na.rm = TRUE))
+  summarise(Media_Geral = mean(MG, na.rm = TRUE), .groups = "drop")
 
-# Calcular a Média dos Top 5 por TIPO
-media_top5 <- top5_mg |> 
+media_top5 <- top5_local |> 
   group_by(TIPO) |> 
-  summarise(media_top5_MG = mean(MG, na.rm = TRUE))
+  summarise(Media_Top5 = mean(MG, na.rm = TRUE), .groups = "drop")
 
-# Unir e calcular o Diferencial de Seleção (DS)
-diferencial_selecao <- media_geral |> 
-  left_join(media_top5, by = "TIPO") |> 
-  mutate(DS = media_top5_MG - media_geral_MG)
+# Tabela do Diferencial de Seleção (DS = Média Top 5 - Média Geral)
+tabela_ds <- left_join(media_geral, media_top5, by = "TIPO") |> 
+  mutate(DS = Media_Top5 - Media_Geral)
 
-# Exibir a tabela com os cálculos no Quarto
-print(diferencial_selecao)
+# Exibir os resultados do DS em formato de tabela no relatório
+kable(
+  tabela_ds,
+  format = "html",
+  escape = FALSE,
+  col.names = c("Tipo de Linhaça", "Média Geral (g)", "Média Top 5 (g)", "Diferencial de Seleção - DS (g)"),
+  align = c("l", "c", "c", "c"),
+  digits = 2,
+  caption = "<div style='text-align: center; color: black; border-top: 2px solid black; border-bottom: 2px solid black; padding: 6px 0; margin-bottom: 8px;'><span style='color: black;'><b>Tabela 4.</b> Diferencial de seleção (DS) para massa de grãos por tipo de linhaça</span></div>"
+) |> 
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    position = "center"
+  )
 
-# Gráfico de Barras do Diferencial de Seleção por Tipo
-ggplot(diferencial_selecao, aes(x = TIPO, y = DS, fill = TIPO)) +
-  geom_col(width = 0.5, alpha = 0.85) +
-  geom_text(aes(label = round(DS, 2)), vjust = -0.5, fontface = "bold") +
-  scale_fill_manual(values = c("DOURADA" = "gold3", "MARROM" = "chocolate4")) +
-  labs(
-    title = "Diferencial de Seleção (DS) para Produção de Grãos (MG)",
-    subtitle = "Diferença entre a média dos Top 5 genótipos e a média geral",
-    x = "Tipo de Linhaça",
-    y = "Diferencial de Seleção (DS)"
+# Organizar dados para as 4 barras do gráfico
+dados_grafico_ds <- bind_rows(
+  media_geral |> rename(Media = Media_Geral) |> mutate(Grupo = "Média Geral"),
+  media_top5 |> rename(Media = Media_Top5) |> mutate(Grupo = "Média Top 5")
+) |> 
+  mutate(
+    Grupo = factor(Grupo, levels = c("Média Geral", "Média Top 5")),
+    TIPO = factor(TIPO, levels = c("DOURADA", "MARROM"))
+  )
+
+# Gerar o Gráfico de Barras Comparativo (Figura 4)
+ggplot(dados_grafico_ds, aes(x = TIPO, y = Media, fill = Grupo)) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.6) +
+  geom_text(
+    aes(label = sprintf("%.2f g", Media)),
+    position = position_dodge(width = 0.7),
+    vjust = -0.5,
+    size = 3.8,
+    fontface = "bold"
   ) +
-  ylim(0, max(diferencial_selecao$DS) * 1.2) + # Espaço para o texto do valor no topo da barra
+  scale_fill_manual(values = c("Média Geral" = "gray60", "Média Top 5" = "#2c7fb8")) +
+  scale_y_continuous(limits = c(0, max(dados_grafico_ds$Media) * 1.15)) +
+  labs(
+    title = "<b>Figura 4.</b> Comparação entre Média Geral e Média dos Top 5 Genótipos (Diferencial de Seleção)",
+    x = "Tipo de Linhaça",
+    y = "Massa Média de Grãos - MG (g)",
+    fill = "Grupo"
+  ) +
   theme_minimal() +
-  theme(legend.position = "none")
-
+  theme(
+    plot.title = ggtext::element_markdown(face = "plain", size = 12, hjust = 0),
+    legend.position = "top",
+    legend.title = element_blank(),
+    panel.grid.major.x = element_blank()
+  )
 ```
 
 ## Conclusão
 
-Nesta seção, escreva um breve parágrafo resumindo suas principais descobertas com base nas visualizações que você criou.
-
-*(Escreva sua conclusão aqui)*
+A altura da planta não apresentou relação estatisticamente significativa com o número de cápsulas, indicando ausência de padrão entre essas variáveis. Em contrapartida, a massa de grãos (MG) obteve correlação positiva de alta magnitude e significativa com a massa de cápsulas, número de cápsulas e número de grãos, demonstrando potencial para seleção indireta. Houve diferença significativa para a altura de plantas , sendo os genótipos do tipo marrom mais altos e menos homogêneos do que os do tipo dourada. Por fim, a seleção dos Top 5 genótipos de cada tipo proporcionou expressivos diferenciais de seleção, confirmando o ganho genético na produção de grãos.
