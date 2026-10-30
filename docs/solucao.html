@@ -242,13 +242,14 @@ window.Quarto = {
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escreva seu código aqui para carregar os pacotes e importar os dados.</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rio)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>graos <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"graos.csv"</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>capsulas <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"capsulas.xlsx"</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>laboratorio <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"laboratorio.xlsx"</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>mmg <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"mmg.xlsx"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rio)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>graos <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"graos.csv"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>capsulas <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"capsulas.xlsx"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>laboratorio <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"laboratorio.xlsx"</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>mmg <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"mmg.xlsx"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="análise-e-consolidação-por-planta" class="level3">
@@ -286,9 +287,747 @@ window.Quarto = {
 <span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Unir os dados calculados com o data frame 'laboratorio' e criar o resultado final</span></span>
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>laboratorio <span class="ot">&lt;-</span> </span>
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  laboratorio <span class="sc">|&gt;</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">img_id =</span> <span class="fu">parse_number</span>(<span class="fu">as.character</span>(IMG))) <span class="sc">|&gt;</span> </span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(graos_resumido, <span class="at">by =</span> <span class="st">"img_id"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(capsulas_resumido, <span class="at">by =</span> <span class="st">"img_id"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">IMG_ID =</span> <span class="fu">parse_number</span>(<span class="fu">as.character</span>(IMG))) <span class="sc">|&gt;</span> </span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>IMG) <span class="sc">|&gt;</span> </span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(IMG_ID, TIPO, GEN, PLANTA) <span class="sc">|&gt;</span>  <span class="co"># &lt;--- ADICIONE ESTA LINHA AQUI</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(graos_resumido, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"IMG_ID"</span> <span class="ot">=</span> <span class="st">"img_id"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(capsulas_resumido, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"IMG_ID"</span> <span class="ot">=</span> <span class="st">"img_id"</span>))</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Exibição de tabela</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>laboratorio <span class="sc">|&gt;</span> </span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">15</span>) <span class="sc">|&gt;</span> <span class="co"># Exibe as 15 primeiras plantas para não sobrecarregar a página</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">md</span>(<span class="st">"**Tabela 1.** Consolidação de Dados por Planta"</span>)</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">c</span>(AP, AC, MC, MG, CG, LG),</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">2</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sub_missing</span>(<span class="at">missing_text =</span> <span class="st">"-"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"gray"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Primeira nota de rodapé</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">footnote =</span> <span class="fu">paste0</span>(<span class="st">"Exibindo as primeiras 15 plantas de um total de "</span>, <span class="fu">nrow</span>(laboratorio), <span class="st">" observações presentes no conjunto de dados completo."</span>)</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Segunda nota de rodapé (ficará na linha de baixo)</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">footnote =</span> <span class="fu">md</span>(<span class="st">"*Legenda: AP = Altura de Planta; AC = Altura de Cápsula; NR = Número de Ramos; MC = Massa de Cápsula; MG = Massa de Grãos; NG = Número de Grãos; CG = Comprimento de Grão; LG = Largura de Grão; NC = Número de Cápsulas.*"</span>)</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_options</span>(</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    <span class="at">data_row.padding =</span> <span class="fu">px</span>(<span class="dv">3</span>) <span class="co"># &lt;--- REDUZ A ALTURA/ESPAÇAMENTO DAS LINHAS</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="evzedjbjty" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#evzedjbjty table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#evzedjbjty thead, #evzedjbjty tbody, #evzedjbjty tfoot, #evzedjbjty tr, #evzedjbjty td, #evzedjbjty th {
+  border-style: none;
+}
+
+#evzedjbjty p {
+  margin: 0;
+  padding: 0;
+}
+
+#evzedjbjty .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #000000;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #000000;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#evzedjbjty .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#evzedjbjty .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#evzedjbjty .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#evzedjbjty .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#evzedjbjty .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#evzedjbjty .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#evzedjbjty .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#evzedjbjty .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#evzedjbjty .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#evzedjbjty .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#evzedjbjty .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#evzedjbjty .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#evzedjbjty .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#evzedjbjty .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: middle;
+}
+
+#evzedjbjty .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#evzedjbjty .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#evzedjbjty .gt_row {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: none;
+  border-top-width: 1px;
+  border-top-color: #D5D5D5;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D5D5D5;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D5D5D5;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#evzedjbjty .gt_stub {
+  color: #FFFFFF;
+  background-color: #5F5F5F;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #5F5F5F;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#evzedjbjty .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#evzedjbjty .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#evzedjbjty .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#evzedjbjty .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#evzedjbjty .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #5F5F5F;
+}
+
+#evzedjbjty .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#evzedjbjty .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#evzedjbjty .gt_grand_summary_row {
+  color: #333333;
+  background-color: #D5D5D5;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#evzedjbjty .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #5F5F5F;
+}
+
+#evzedjbjty .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #5F5F5F;
+}
+
+#evzedjbjty .gt_striped {
+  background-color: #F4F4F4;
+}
+
+#evzedjbjty .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#evzedjbjty .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#evzedjbjty .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#evzedjbjty .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#evzedjbjty .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#evzedjbjty .gt_left {
+  text-align: left;
+}
+
+#evzedjbjty .gt_center {
+  text-align: center;
+}
+
+#evzedjbjty .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#evzedjbjty .gt_font_normal {
+  font-weight: normal;
+}
+
+#evzedjbjty .gt_font_bold {
+  font-weight: bold;
+}
+
+#evzedjbjty .gt_font_italic {
+  font-style: italic;
+}
+
+#evzedjbjty .gt_super {
+  font-size: 65%;
+}
+
+#evzedjbjty .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#evzedjbjty .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#evzedjbjty .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#evzedjbjty .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#evzedjbjty .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#evzedjbjty .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#evzedjbjty .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#evzedjbjty .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#evzedjbjty div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="13" class="gt_heading gt_title gt_font_normal gt_bottom_border"><strong>Tabela 1.</strong> Consolidação de Dados por Planta</td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="IMG_ID" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">IMG_ID</th>
+<th id="TIPO" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">TIPO</th>
+<th id="GEN" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">GEN</th>
+<th id="PLANTA" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">PLANTA</th>
+<th id="AP" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">AP</th>
+<th id="AC" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">AC</th>
+<th id="NR" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">NR</th>
+<th id="MC" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">MC</th>
+<th id="MG" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">MG</th>
+<th id="NG" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">NG</th>
+<th id="CG" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">CG</th>
+<th id="LG" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">LG</th>
+<th id="NC" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">NC</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_right" headers="IMG_ID">1</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_left" headers="GEN">G1</td>
+<td class="gt_row gt_left" headers="PLANTA">P1</td>
+<td class="gt_row gt_right" headers="AP">78.00</td>
+<td class="gt_row gt_right" headers="AC">42.00</td>
+<td class="gt_row gt_right" headers="NR">3</td>
+<td class="gt_row gt_right" headers="MC">4.78</td>
+<td class="gt_row gt_right" headers="MG">3.76</td>
+<td class="gt_row gt_right" headers="NG">732</td>
+<td class="gt_row gt_right" headers="CG">0.38</td>
+<td class="gt_row gt_right" headers="LG">0.19</td>
+<td class="gt_row gt_right" headers="NC">-</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right gt_striped" headers="IMG_ID">2</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_left gt_striped" headers="GEN">G1</td>
+<td class="gt_row gt_left gt_striped" headers="PLANTA">P2</td>
+<td class="gt_row gt_right gt_striped" headers="AP">82.00</td>
+<td class="gt_row gt_right gt_striped" headers="AC">37.00</td>
+<td class="gt_row gt_right gt_striped" headers="NR">3</td>
+<td class="gt_row gt_right gt_striped" headers="MC">6.87</td>
+<td class="gt_row gt_right gt_striped" headers="MG">5.30</td>
+<td class="gt_row gt_right gt_striped" headers="NG">1051</td>
+<td class="gt_row gt_right gt_striped" headers="CG">0.39</td>
+<td class="gt_row gt_right gt_striped" headers="LG">0.20</td>
+<td class="gt_row gt_right gt_striped" headers="NC">155</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="IMG_ID">3</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_left" headers="GEN">G1</td>
+<td class="gt_row gt_left" headers="PLANTA">P3</td>
+<td class="gt_row gt_right" headers="AP">70.00</td>
+<td class="gt_row gt_right" headers="AC">34.00</td>
+<td class="gt_row gt_right" headers="NR">3</td>
+<td class="gt_row gt_right" headers="MC">3.33</td>
+<td class="gt_row gt_right" headers="MG">2.66</td>
+<td class="gt_row gt_right" headers="NG">530</td>
+<td class="gt_row gt_right" headers="CG">0.40</td>
+<td class="gt_row gt_right" headers="LG">0.20</td>
+<td class="gt_row gt_right" headers="NC">69</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right gt_striped" headers="IMG_ID">4</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_left gt_striped" headers="GEN">G1</td>
+<td class="gt_row gt_left gt_striped" headers="PLANTA">P4</td>
+<td class="gt_row gt_right gt_striped" headers="AP">68.00</td>
+<td class="gt_row gt_right gt_striped" headers="AC">40.00</td>
+<td class="gt_row gt_right gt_striped" headers="NR">2</td>
+<td class="gt_row gt_right gt_striped" headers="MC">2.85</td>
+<td class="gt_row gt_right gt_striped" headers="MG">2.32</td>
+<td class="gt_row gt_right gt_striped" headers="NG">463</td>
+<td class="gt_row gt_right gt_striped" headers="CG">0.39</td>
+<td class="gt_row gt_right gt_striped" headers="LG">0.20</td>
+<td class="gt_row gt_right gt_striped" headers="NC">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="IMG_ID">5</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_left" headers="GEN">G1</td>
+<td class="gt_row gt_left" headers="PLANTA">P5</td>
+<td class="gt_row gt_right" headers="AP">88.00</td>
+<td class="gt_row gt_right" headers="AC">44.00</td>
+<td class="gt_row gt_right" headers="NR">2</td>
+<td class="gt_row gt_right" headers="MC">5.19</td>
+<td class="gt_row gt_right" headers="MG">3.91</td>
+<td class="gt_row gt_right" headers="NG">748</td>
+<td class="gt_row gt_right" headers="CG">0.38</td>
+<td class="gt_row gt_right" headers="LG">0.19</td>
+<td class="gt_row gt_right" headers="NC">107</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right gt_striped" headers="IMG_ID">6</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_left gt_striped" headers="GEN">G3</td>
+<td class="gt_row gt_left gt_striped" headers="PLANTA">P1</td>
+<td class="gt_row gt_right gt_striped" headers="AP">75.50</td>
+<td class="gt_row gt_right gt_striped" headers="AC">38.00</td>
+<td class="gt_row gt_right gt_striped" headers="NR">4</td>
+<td class="gt_row gt_right gt_striped" headers="MC">8.00</td>
+<td class="gt_row gt_right gt_striped" headers="MG">3.97</td>
+<td class="gt_row gt_right gt_striped" headers="NG">1140</td>
+<td class="gt_row gt_right gt_striped" headers="CG">0.38</td>
+<td class="gt_row gt_right gt_striped" headers="LG">0.20</td>
+<td class="gt_row gt_right gt_striped" headers="NC">162</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="IMG_ID">7</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_left" headers="GEN">G3</td>
+<td class="gt_row gt_left" headers="PLANTA">P2</td>
+<td class="gt_row gt_right" headers="AP">74.00</td>
+<td class="gt_row gt_right" headers="AC">43.00</td>
+<td class="gt_row gt_right" headers="NR">3</td>
+<td class="gt_row gt_right" headers="MC">3.50</td>
+<td class="gt_row gt_right" headers="MG">3.00</td>
+<td class="gt_row gt_right" headers="NG">821</td>
+<td class="gt_row gt_right" headers="CG">0.39</td>
+<td class="gt_row gt_right" headers="LG">0.21</td>
+<td class="gt_row gt_right" headers="NC">120</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right gt_striped" headers="IMG_ID">8</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_left gt_striped" headers="GEN">G3</td>
+<td class="gt_row gt_left gt_striped" headers="PLANTA">P3</td>
+<td class="gt_row gt_right gt_striped" headers="AP">-</td>
+<td class="gt_row gt_right gt_striped" headers="AC">-</td>
+<td class="gt_row gt_right gt_striped" headers="NR">-</td>
+<td class="gt_row gt_right gt_striped" headers="MC">-</td>
+<td class="gt_row gt_right gt_striped" headers="MG">-</td>
+<td class="gt_row gt_right gt_striped" headers="NG">-</td>
+<td class="gt_row gt_right gt_striped" headers="CG">-</td>
+<td class="gt_row gt_right gt_striped" headers="LG">-</td>
+<td class="gt_row gt_right gt_striped" headers="NC">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="IMG_ID">9</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_left" headers="GEN">G3</td>
+<td class="gt_row gt_left" headers="PLANTA">P4</td>
+<td class="gt_row gt_right" headers="AP">-</td>
+<td class="gt_row gt_right" headers="AC">-</td>
+<td class="gt_row gt_right" headers="NR">-</td>
+<td class="gt_row gt_right" headers="MC">-</td>
+<td class="gt_row gt_right" headers="MG">-</td>
+<td class="gt_row gt_right" headers="NG">-</td>
+<td class="gt_row gt_right" headers="CG">-</td>
+<td class="gt_row gt_right" headers="LG">-</td>
+<td class="gt_row gt_right" headers="NC">-</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right gt_striped" headers="IMG_ID">10</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_left gt_striped" headers="GEN">G3</td>
+<td class="gt_row gt_left gt_striped" headers="PLANTA">P5</td>
+<td class="gt_row gt_right gt_striped" headers="AP">-</td>
+<td class="gt_row gt_right gt_striped" headers="AC">-</td>
+<td class="gt_row gt_right gt_striped" headers="NR">-</td>
+<td class="gt_row gt_right gt_striped" headers="MC">-</td>
+<td class="gt_row gt_right gt_striped" headers="MG">-</td>
+<td class="gt_row gt_right gt_striped" headers="NG">-</td>
+<td class="gt_row gt_right gt_striped" headers="CG">-</td>
+<td class="gt_row gt_right gt_striped" headers="LG">-</td>
+<td class="gt_row gt_right gt_striped" headers="NC">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="IMG_ID">11</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_left" headers="GEN">G5</td>
+<td class="gt_row gt_left" headers="PLANTA">P1</td>
+<td class="gt_row gt_right" headers="AP">71.00</td>
+<td class="gt_row gt_right" headers="AC">42.00</td>
+<td class="gt_row gt_right" headers="NR">4</td>
+<td class="gt_row gt_right" headers="MC">4.60</td>
+<td class="gt_row gt_right" headers="MG">3.70</td>
+<td class="gt_row gt_right" headers="NG">772</td>
+<td class="gt_row gt_right" headers="CG">0.38</td>
+<td class="gt_row gt_right" headers="LG">0.19</td>
+<td class="gt_row gt_right" headers="NC">-</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right gt_striped" headers="IMG_ID">12</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_left gt_striped" headers="GEN">G5</td>
+<td class="gt_row gt_left gt_striped" headers="PLANTA">P2</td>
+<td class="gt_row gt_right gt_striped" headers="AP">76.00</td>
+<td class="gt_row gt_right gt_striped" headers="AC">45.00</td>
+<td class="gt_row gt_right gt_striped" headers="NR">5</td>
+<td class="gt_row gt_right gt_striped" headers="MC">6.06</td>
+<td class="gt_row gt_right gt_striped" headers="MG">5.91</td>
+<td class="gt_row gt_right gt_striped" headers="NG">1227</td>
+<td class="gt_row gt_right gt_striped" headers="CG">0.38</td>
+<td class="gt_row gt_right gt_striped" headers="LG">0.19</td>
+<td class="gt_row gt_right gt_striped" headers="NC">241</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="IMG_ID">13</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_left" headers="GEN">G5</td>
+<td class="gt_row gt_left" headers="PLANTA">P3</td>
+<td class="gt_row gt_right" headers="AP">84.00</td>
+<td class="gt_row gt_right" headers="AC">41.00</td>
+<td class="gt_row gt_right" headers="NR">6</td>
+<td class="gt_row gt_right" headers="MC">11.53</td>
+<td class="gt_row gt_right" headers="MG">9.05</td>
+<td class="gt_row gt_right" headers="NG">1825</td>
+<td class="gt_row gt_right" headers="CG">0.39</td>
+<td class="gt_row gt_right" headers="LG">0.20</td>
+<td class="gt_row gt_right" headers="NC">240</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right gt_striped" headers="IMG_ID">14</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_left gt_striped" headers="GEN">G5</td>
+<td class="gt_row gt_left gt_striped" headers="PLANTA">P4</td>
+<td class="gt_row gt_right gt_striped" headers="AP">81.00</td>
+<td class="gt_row gt_right gt_striped" headers="AC">42.00</td>
+<td class="gt_row gt_right gt_striped" headers="NR">5</td>
+<td class="gt_row gt_right gt_striped" headers="MC">7.50</td>
+<td class="gt_row gt_right gt_striped" headers="MG">4.71</td>
+<td class="gt_row gt_right gt_striped" headers="NG">987</td>
+<td class="gt_row gt_right gt_striped" headers="CG">0.37</td>
+<td class="gt_row gt_right gt_striped" headers="LG">0.20</td>
+<td class="gt_row gt_right gt_striped" headers="NC">171</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="IMG_ID">15</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_left" headers="GEN">G5</td>
+<td class="gt_row gt_left" headers="PLANTA">P5</td>
+<td class="gt_row gt_right" headers="AP">75.00</td>
+<td class="gt_row gt_right" headers="AC">40.00</td>
+<td class="gt_row gt_right" headers="NR">2</td>
+<td class="gt_row gt_right" headers="MC">3.94</td>
+<td class="gt_row gt_right" headers="MG">3.03</td>
+<td class="gt_row gt_right" headers="NG">651</td>
+<td class="gt_row gt_right" headers="CG">0.39</td>
+<td class="gt_row gt_right" headers="LG">0.20</td>
+<td class="gt_row gt_right" headers="NC">244</td>
+</tr>
+</tbody><tfoot>
+<tr class="gt_footnotes odd">
+<td colspan="13" class="gt_footnote">Exibindo as primeiras 15 plantas de um total de 600 observações presentes no conjunto de dados completo.</td>
+</tr>
+<tr class="gt_footnotes even">
+<td colspan="13" class="gt_footnote"><em>Legenda: AP = Altura de Planta; AC = Altura de Cápsula; NR = Número de Ramos; MC = Massa de Cápsula; MG = Massa de Grãos; NG = Número de Grãos; CG = Comprimento de Grão; LG = Largura de Grão; NC = Número de Cápsulas.</em></td>
+</tr>
+</tfoot>
+
+</table>
+
+</div>
+</div>
 </div>
 </section>
 <section id="análise-e-consolidação-por-genótipo" class="level3">
@@ -306,37 +1045,2293 @@ window.Quarto = {
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Agrupar os dados consolidados por genótipo e calcular a média das variáveis numéricas</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>genotipos_resumido <span class="ot">&lt;-</span> laboratorio <span class="sc">|&gt;</span> </span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(GEN) <span class="sc">|&gt;</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(GEN, TIPO) <span class="sc">|&gt;</span> </span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">where</span>(is.numeric) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">any_of</span>(<span class="st">"img_id"</span>), </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">where</span>(is.numeric) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"IMG_ID"</span>, <span class="st">"img_id"</span>)), </span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>      \(x) <span class="fu">mean</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Adicionar a massa de mil grãos (mmg) ao data frame de genótipos</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>resultado_genotipos <span class="ot">&lt;-</span> genotipos_resumido <span class="sc">|&gt;</span> </span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(mmg, <span class="at">by =</span> <span class="st">"GEN"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Converter GEN em fator ordenado numericamente pelo número após o 'G'</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span> <span class="co"># &lt;--- DESFAZ O AGRUPAMENTO PARA NÃO SOBRECARREGAR A MEMÓRIA</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Adicionar MMG e reordenar as colunas</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>resultado_genotipos <span class="ot">&lt;-</span> genotipos_resumido <span class="sc">|&gt;</span> </span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(mmg <span class="sc">|&gt;</span> <span class="fu">select</span>(GEN, <span class="at">MMG =</span> mmg), <span class="at">by =</span> <span class="st">"GEN"</span>) <span class="sc">|&gt;</span> </span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">GEN =</span> <span class="fu">fct_reorder</span>(GEN, <span class="fu">parse_number</span>(GEN))</span>
 <span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Reordenar as linhas do data frame de acordo com o fator criado (G1, G2, ..., G10, etc.)</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(GEN)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(GEN) <span class="sc">|&gt;</span> </span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(GEN, TIPO, AP, AC, NR, MC, MG, NC, NG, CG, LG, MMG)</span>
 <span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizar o resultado ordenado corretamente</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(resultado_genotipos)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 16
-  GEN     IMG    AP    AC    NR     MC     MG    NG      CG      LG    NC  PLOT
-  &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-1 G1        3  77.2  39.4   2.6   4.60   3.59  705.   0.389   0.198  110.     1
-2 GPOP1   593 NaN   NaN   NaN   NaN    NaN     NaN  NaN     NaN      NaN    119
-3 G2      193  89.6  51.8   4.4   7.94   6.32 1171.   0.377   0.193  159.    39
-4 GPOP2   598 NaN   NaN   NaN   NaN    NaN     NaN  NaN     NaN      NaN    120
-5 G3        8  74.8  40.5   3.5   5.75   3.49  980.   0.387   0.208  141      2
-6 G4      198  78    52.4   5.2   8.84   7.04 1157.   0.376   0.201  129     40
-# ℹ 4 more variables: ROW &lt;dbl&gt;, COL &lt;dbl&gt;, TIPO &lt;chr&gt;, mmg &lt;dbl&gt;</code></pre>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Criação e formatação da tabela gt</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>tabela_gt <span class="ot">&lt;-</span> resultado_genotipos <span class="sc">|&gt;</span> </span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(<span class="at">groupname_col =</span> <span class="cn">NULL</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">md</span>(<span class="st">"**Tabela 2.** Consolidação de Dados por Genótipo"</span>)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">GEN  =</span> <span class="st">"GEN"</span>,</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">TIPO =</span> <span class="st">"TIPO"</span>,</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">AP   =</span> <span class="st">"AP"</span>,</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">AC   =</span> <span class="st">"AC"</span>,</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">NR   =</span> <span class="st">"NR"</span>,</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">MC   =</span> <span class="st">"MC"</span>,</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">MG   =</span> <span class="st">"MG"</span>,</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">NC   =</span> <span class="st">"NC"</span>,</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">NG   =</span> <span class="st">"NG"</span>,</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">CG   =</span> <span class="st">"CG"</span>,</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">LG   =</span> <span class="st">"LG"</span>,</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">MMG  =</span> <span class="st">"MMG"</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_spanner</span>(<span class="at">label =</span> <span class="st">"(cm)"</span>, <span class="at">columns =</span> <span class="fu">c</span>(AP, AC)) <span class="sc">|&gt;</span> </span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_spanner</span>(<span class="at">label =</span> <span class="st">"(g)"</span>, <span class="at">columns =</span> <span class="fu">c</span>(MC, MG, MMG)) <span class="sc">|&gt;</span> </span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_spanner</span>(<span class="at">label =</span> <span class="st">"(mm)"</span>, <span class="at">columns =</span> <span class="fu">c</span>(CG, LG)) <span class="sc">|&gt;</span> </span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_spanner</span>(<span class="at">label =</span> <span class="st">"(unidades)"</span>, <span class="at">columns =</span> <span class="fu">c</span>(NR, NC, NG)) <span class="sc">|&gt;</span> </span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>  <span class="co"># SUB_MISSING PRIMEIRO PARA EVITAR ERRO DE MEMÓRIA NO FMT_NUMBER COM NaN/NA</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sub_missing</span>(</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">everything</span>(),</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_text =</span> <span class="st">"-"</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">c</span>(AP, AC, MC, MG, CG, LG, MMG),</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">2</span>,</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    <span class="at">dec_mark =</span> <span class="st">","</span>,</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    <span class="at">sep_mark =</span> <span class="st">"."</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(</span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">c</span>(NR, NG, NC),</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">1</span>,</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>    <span class="at">dec_mark =</span> <span class="st">","</span>,</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>    <span class="at">sep_mark =</span> <span class="st">"."</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_align</span>(</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"center"</span>,</span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">everything</span>()</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_align</span>(</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"left"</span>,</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">c</span>(GEN, TIPO)</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>  <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"gray"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_options</span>(</span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>    <span class="at">data_row.padding =</span> <span class="fu">px</span>(<span class="dv">3</span>),</span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>    <span class="at">table.font.size =</span> <span class="fu">px</span>(<span class="dv">12</span>),</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>    <span class="at">heading.title.font.size =</span> <span class="fu">px</span>(<span class="dv">14</span>),</span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>    <span class="at">heading.subtitle.font.size =</span> <span class="fu">px</span>(<span class="dv">11</span>),</span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>    <span class="at">column_labels.font.weight =</span> <span class="st">"bold"</span>,</span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>    <span class="at">table_body.hlines.color =</span> <span class="st">"lightgray"</span>,</span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a>    <span class="at">table.border.top.color =</span> <span class="st">"black"</span>,</span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a>    <span class="at">table.border.top.width =</span> <span class="fu">px</span>(<span class="dv">2</span>),</span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a>    <span class="at">table.border.bottom.color =</span> <span class="st">"black"</span>,</span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>    <span class="at">table.border.bottom.width =</span> <span class="fu">px</span>(<span class="dv">2</span>),</span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>    <span class="at">column_labels.border.top.color =</span> <span class="st">"black"</span>,</span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>    <span class="at">column_labels.border.bottom.color =</span> <span class="st">"black"</span>,</span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a>    <span class="at">column_labels.border.bottom.width =</span> <span class="fu">px</span>(<span class="fl">1.5</span>)</span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>    <span class="at">footnote =</span> <span class="fu">md</span>(<span class="st">"*Legenda: AP: Altura da Planta; AC: Altura de Cápsula; NR: Número de Ramos; MC: Massa de Cápsulas; MG: Massa de Grãos; NC: Número de Cápsulas; NG: Número de Grãos; CG: Comprimento do Grão; LG: Largura do Grão; MMG: Massa de Mil Grãos.*"</span>)</span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a><span class="co"># Exibir a tabela</span></span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>tabela_gt</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="tazohgrgcc" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#tazohgrgcc table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#tazohgrgcc thead, #tazohgrgcc tbody, #tazohgrgcc tfoot, #tazohgrgcc tr, #tazohgrgcc td, #tazohgrgcc th {
+  border-style: none;
+}
+
+#tazohgrgcc p {
+  margin: 0;
+  padding: 0;
+}
+
+#tazohgrgcc .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 12px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #000000;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #000000;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#tazohgrgcc .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#tazohgrgcc .gt_title {
+  color: #333333;
+  font-size: 14px;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#tazohgrgcc .gt_subtitle {
+  color: #333333;
+  font-size: 11px;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#tazohgrgcc .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#tazohgrgcc .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#tazohgrgcc .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #000000;
+  border-bottom-style: solid;
+  border-bottom-width: 1.5px;
+  border-bottom-color: #000000;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#tazohgrgcc .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: bold;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#tazohgrgcc .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: bold;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#tazohgrgcc .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#tazohgrgcc .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#tazohgrgcc .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 1.5px;
+  border-bottom-color: #000000;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#tazohgrgcc .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#tazohgrgcc .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#tazohgrgcc .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: middle;
+}
+
+#tazohgrgcc .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#tazohgrgcc .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#tazohgrgcc .gt_row {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: none;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D5D5D5;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D5D5D5;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#tazohgrgcc .gt_stub {
+  color: #FFFFFF;
+  background-color: #5F5F5F;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #5F5F5F;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tazohgrgcc .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#tazohgrgcc .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#tazohgrgcc .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#tazohgrgcc .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tazohgrgcc .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #5F5F5F;
+}
+
+#tazohgrgcc .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#tazohgrgcc .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#tazohgrgcc .gt_grand_summary_row {
+  color: #333333;
+  background-color: #D5D5D5;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tazohgrgcc .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #5F5F5F;
+}
+
+#tazohgrgcc .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #5F5F5F;
+}
+
+#tazohgrgcc .gt_striped {
+  background-color: #F4F4F4;
+}
+
+#tazohgrgcc .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#tazohgrgcc .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#tazohgrgcc .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tazohgrgcc .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#tazohgrgcc .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tazohgrgcc .gt_left {
+  text-align: left;
+}
+
+#tazohgrgcc .gt_center {
+  text-align: center;
+}
+
+#tazohgrgcc .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#tazohgrgcc .gt_font_normal {
+  font-weight: normal;
+}
+
+#tazohgrgcc .gt_font_bold {
+  font-weight: bold;
+}
+
+#tazohgrgcc .gt_font_italic {
+  font-style: italic;
+}
+
+#tazohgrgcc .gt_super {
+  font-size: 65%;
+}
+
+#tazohgrgcc .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#tazohgrgcc .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#tazohgrgcc .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#tazohgrgcc .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#tazohgrgcc .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#tazohgrgcc .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#tazohgrgcc .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#tazohgrgcc .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#tazohgrgcc div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="gt_heading header">
+<td colspan="12" class="gt_heading gt_title gt_font_normal gt_bottom_border"><strong>Tabela 2.</strong> Consolidação de Dados por Genótipo</td>
+</tr>
+<tr class="gt_col_headings gt_spanner_row even">
+<th rowspan="2" id="GEN" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">GEN</th>
+<th rowspan="2" id="TIPO" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">TIPO</th>
+<th colspan="2" id="a(cm)" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+(cm)
+</div></th>
+<th colspan="3" id="a(unidades)" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+(unidades)
+</div></th>
+<th colspan="3" id="a(g)" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+(g)
+</div></th>
+<th colspan="2" id="a(mm)" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+(mm)
+</div></th>
+</tr>
+<tr class="gt_col_headings header">
+<th id="AP" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">AP</th>
+<th id="AC" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">AC</th>
+<th id="NR" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">NR</th>
+<th id="NC" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">NC</th>
+<th id="NG" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">NG</th>
+<th id="MC" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">MC</th>
+<th id="MG" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">MG</th>
+<th id="MMG" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">MMG</th>
+<th id="CG" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">CG</th>
+<th id="LG" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">LG</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G1</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">77,20</td>
+<td class="gt_row gt_center" headers="AC">39,40</td>
+<td class="gt_row gt_center" headers="NR">2,6</td>
+<td class="gt_row gt_center" headers="NC">110,3</td>
+<td class="gt_row gt_center" headers="NG">704,8</td>
+<td class="gt_row gt_center" headers="MC">4,60</td>
+<td class="gt_row gt_center" headers="MG">3,59</td>
+<td class="gt_row gt_center" headers="MMG">3,65</td>
+<td class="gt_row gt_center" headers="CG">0,39</td>
+<td class="gt_row gt_center" headers="LG">0,20</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">GPOP1</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">-</td>
+<td class="gt_row gt_center gt_striped" headers="AC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NR">-</td>
+<td class="gt_row gt_center gt_striped" headers="NC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MC">-</td>
+<td class="gt_row gt_center gt_striped" headers="MG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">-</td>
+<td class="gt_row gt_center gt_striped" headers="CG">-</td>
+<td class="gt_row gt_center gt_striped" headers="LG">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G2</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">89,60</td>
+<td class="gt_row gt_center" headers="AC">51,80</td>
+<td class="gt_row gt_center" headers="NR">4,4</td>
+<td class="gt_row gt_center" headers="NC">159,2</td>
+<td class="gt_row gt_center" headers="NG">1.171,4</td>
+<td class="gt_row gt_center" headers="MC">7,94</td>
+<td class="gt_row gt_center" headers="MG">6,32</td>
+<td class="gt_row gt_center" headers="MMG">3,07</td>
+<td class="gt_row gt_center" headers="CG">0,38</td>
+<td class="gt_row gt_center" headers="LG">0,19</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">GPOP2</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">-</td>
+<td class="gt_row gt_center gt_striped" headers="AC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NR">-</td>
+<td class="gt_row gt_center gt_striped" headers="NC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MC">-</td>
+<td class="gt_row gt_center gt_striped" headers="MG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">-</td>
+<td class="gt_row gt_center gt_striped" headers="CG">-</td>
+<td class="gt_row gt_center gt_striped" headers="LG">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G3</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">74,75</td>
+<td class="gt_row gt_center" headers="AC">40,50</td>
+<td class="gt_row gt_center" headers="NR">3,5</td>
+<td class="gt_row gt_center" headers="NC">141,0</td>
+<td class="gt_row gt_center" headers="NG">980,5</td>
+<td class="gt_row gt_center" headers="MC">5,75</td>
+<td class="gt_row gt_center" headers="MG">3,49</td>
+<td class="gt_row gt_center" headers="MMG">-</td>
+<td class="gt_row gt_center" headers="CG">0,39</td>
+<td class="gt_row gt_center" headers="LG">0,21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G4</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">78,00</td>
+<td class="gt_row gt_center gt_striped" headers="AC">52,40</td>
+<td class="gt_row gt_center gt_striped" headers="NR">5,2</td>
+<td class="gt_row gt_center gt_striped" headers="NC">129,0</td>
+<td class="gt_row gt_center gt_striped" headers="NG">1.157,4</td>
+<td class="gt_row gt_center gt_striped" headers="MC">8,84</td>
+<td class="gt_row gt_center gt_striped" headers="MG">7,04</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">3,09</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,38</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G5</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">77,40</td>
+<td class="gt_row gt_center" headers="AC">42,00</td>
+<td class="gt_row gt_center" headers="NR">4,4</td>
+<td class="gt_row gt_center" headers="NC">224,0</td>
+<td class="gt_row gt_center" headers="NG">1.092,4</td>
+<td class="gt_row gt_center" headers="MC">6,73</td>
+<td class="gt_row gt_center" headers="MG">5,28</td>
+<td class="gt_row gt_center" headers="MMG">3,09</td>
+<td class="gt_row gt_center" headers="CG">0,38</td>
+<td class="gt_row gt_center" headers="LG">0,20</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G6</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">75,00</td>
+<td class="gt_row gt_center gt_striped" headers="AC">45,00</td>
+<td class="gt_row gt_center gt_striped" headers="NR">2,5</td>
+<td class="gt_row gt_center gt_striped" headers="NC">102,2</td>
+<td class="gt_row gt_center gt_striped" headers="NG">711,4</td>
+<td class="gt_row gt_center gt_striped" headers="MC">4,71</td>
+<td class="gt_row gt_center gt_striped" headers="MG">3,58</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">4,03</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,38</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,19</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G7</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">76,40</td>
+<td class="gt_row gt_center" headers="AC">44,00</td>
+<td class="gt_row gt_center" headers="NR">3,2</td>
+<td class="gt_row gt_center" headers="NC">87,0</td>
+<td class="gt_row gt_center" headers="NG">635,4</td>
+<td class="gt_row gt_center" headers="MC">3,58</td>
+<td class="gt_row gt_center" headers="MG">2,60</td>
+<td class="gt_row gt_center" headers="MMG">1,93</td>
+<td class="gt_row gt_center" headers="CG">0,39</td>
+<td class="gt_row gt_center" headers="LG">0,20</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G9</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">99,60</td>
+<td class="gt_row gt_center gt_striped" headers="AC">63,20</td>
+<td class="gt_row gt_center gt_striped" headers="NR">4,4</td>
+<td class="gt_row gt_center gt_striped" headers="NC">111,8</td>
+<td class="gt_row gt_center gt_striped" headers="NG">696,8</td>
+<td class="gt_row gt_center gt_striped" headers="MC">4,45</td>
+<td class="gt_row gt_center gt_striped" headers="MG">3,41</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">-</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,40</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G10</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">104,70</td>
+<td class="gt_row gt_center" headers="AC">62,90</td>
+<td class="gt_row gt_center" headers="NR">2,4</td>
+<td class="gt_row gt_center" headers="NC">39,2</td>
+<td class="gt_row gt_center" headers="NG">247,4</td>
+<td class="gt_row gt_center" headers="MC">1,89</td>
+<td class="gt_row gt_center" headers="MG">1,33</td>
+<td class="gt_row gt_center" headers="MMG">3,74</td>
+<td class="gt_row gt_center" headers="CG">0,41</td>
+<td class="gt_row gt_center" headers="LG">0,21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G11</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">85,25</td>
+<td class="gt_row gt_center gt_striped" headers="AC">53,00</td>
+<td class="gt_row gt_center gt_striped" headers="NR">2,7</td>
+<td class="gt_row gt_center gt_striped" headers="NC">51,2</td>
+<td class="gt_row gt_center gt_striped" headers="NG">343,2</td>
+<td class="gt_row gt_center gt_striped" headers="MC">2,08</td>
+<td class="gt_row gt_center gt_striped" headers="MG">1,64</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">2,46</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,40</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G12</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">77,00</td>
+<td class="gt_row gt_center" headers="AC">46,00</td>
+<td class="gt_row gt_center" headers="NR">13,0</td>
+<td class="gt_row gt_center" headers="NC">179,0</td>
+<td class="gt_row gt_center" headers="NG">1.122,0</td>
+<td class="gt_row gt_center" headers="MC">6,77</td>
+<td class="gt_row gt_center" headers="MG">4,94</td>
+<td class="gt_row gt_center" headers="MMG">2,75</td>
+<td class="gt_row gt_center" headers="CG">0,36</td>
+<td class="gt_row gt_center" headers="LG">0,20</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G13</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">84,00</td>
+<td class="gt_row gt_center gt_striped" headers="AC">53,60</td>
+<td class="gt_row gt_center gt_striped" headers="NR">2,4</td>
+<td class="gt_row gt_center gt_striped" headers="NC">78,8</td>
+<td class="gt_row gt_center gt_striped" headers="NG">570,0</td>
+<td class="gt_row gt_center gt_striped" headers="MC">3,00</td>
+<td class="gt_row gt_center gt_striped" headers="MG">2,33</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">1,86</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,36</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,19</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G14</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">89,20</td>
+<td class="gt_row gt_center" headers="AC">68,40</td>
+<td class="gt_row gt_center" headers="NR">3,8</td>
+<td class="gt_row gt_center" headers="NC">33,2</td>
+<td class="gt_row gt_center" headers="NG">265,8</td>
+<td class="gt_row gt_center" headers="MC">1,21</td>
+<td class="gt_row gt_center" headers="MG">0,73</td>
+<td class="gt_row gt_center" headers="MMG">3,25</td>
+<td class="gt_row gt_center" headers="CG">0,37</td>
+<td class="gt_row gt_center" headers="LG">0,19</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G15</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">84,40</td>
+<td class="gt_row gt_center gt_striped" headers="AC">53,60</td>
+<td class="gt_row gt_center gt_striped" headers="NR">2,7</td>
+<td class="gt_row gt_center gt_striped" headers="NC">36,2</td>
+<td class="gt_row gt_center gt_striped" headers="NG">213,4</td>
+<td class="gt_row gt_center gt_striped" headers="MC">0,98</td>
+<td class="gt_row gt_center gt_striped" headers="MG">0,68</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">2,52</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,41</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,22</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G16</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">83,00</td>
+<td class="gt_row gt_center" headers="AC">62,00</td>
+<td class="gt_row gt_center" headers="NR">4,5</td>
+<td class="gt_row gt_center" headers="NC">47,0</td>
+<td class="gt_row gt_center" headers="NG">286,0</td>
+<td class="gt_row gt_center" headers="MC">1,58</td>
+<td class="gt_row gt_center" headers="MG">1,16</td>
+<td class="gt_row gt_center" headers="MMG">2,38</td>
+<td class="gt_row gt_center" headers="CG">0,34</td>
+<td class="gt_row gt_center" headers="LG">0,19</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G17</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">93,80</td>
+<td class="gt_row gt_center gt_striped" headers="AC">57,20</td>
+<td class="gt_row gt_center gt_striped" headers="NR">4,0</td>
+<td class="gt_row gt_center gt_striped" headers="NC">36,0</td>
+<td class="gt_row gt_center gt_striped" headers="NG">237,0</td>
+<td class="gt_row gt_center gt_striped" headers="MC">1,61</td>
+<td class="gt_row gt_center gt_striped" headers="MG">1,21</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">2,71</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,39</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G18</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">73,20</td>
+<td class="gt_row gt_center" headers="AC">42,00</td>
+<td class="gt_row gt_center" headers="NR">3,6</td>
+<td class="gt_row gt_center" headers="NC">104,4</td>
+<td class="gt_row gt_center" headers="NG">763,4</td>
+<td class="gt_row gt_center" headers="MC">4,67</td>
+<td class="gt_row gt_center" headers="MG">3,68</td>
+<td class="gt_row gt_center" headers="MMG">2,25</td>
+<td class="gt_row gt_center" headers="CG">0,36</td>
+<td class="gt_row gt_center" headers="LG">0,18</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G19</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">80,20</td>
+<td class="gt_row gt_center gt_striped" headers="AC">44,20</td>
+<td class="gt_row gt_center gt_striped" headers="NR">2,8</td>
+<td class="gt_row gt_center gt_striped" headers="NC">63,8</td>
+<td class="gt_row gt_center gt_striped" headers="NG">420,6</td>
+<td class="gt_row gt_center gt_striped" headers="MC">2,20</td>
+<td class="gt_row gt_center gt_striped" headers="MG">1,55</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">5,37</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,41</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,21</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G20</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">73,25</td>
+<td class="gt_row gt_center" headers="AC">42,25</td>
+<td class="gt_row gt_center" headers="NR">2,0</td>
+<td class="gt_row gt_center" headers="NC">51,4</td>
+<td class="gt_row gt_center" headers="NG">341,4</td>
+<td class="gt_row gt_center" headers="MC">1,59</td>
+<td class="gt_row gt_center" headers="MG">1,34</td>
+<td class="gt_row gt_center" headers="MMG">2,48</td>
+<td class="gt_row gt_center" headers="CG">0,40</td>
+<td class="gt_row gt_center" headers="LG">0,20</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G21</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">70,60</td>
+<td class="gt_row gt_center gt_striped" headers="AC">41,40</td>
+<td class="gt_row gt_center gt_striped" headers="NR">2,0</td>
+<td class="gt_row gt_center gt_striped" headers="NC">58,0</td>
+<td class="gt_row gt_center gt_striped" headers="NG">411,6</td>
+<td class="gt_row gt_center gt_striped" headers="MC">2,74</td>
+<td class="gt_row gt_center gt_striped" headers="MG">2,12</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">4,31</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,36</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,18</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G22</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">76,80</td>
+<td class="gt_row gt_center" headers="AC">47,40</td>
+<td class="gt_row gt_center" headers="NR">2,7</td>
+<td class="gt_row gt_center" headers="NC">60,4</td>
+<td class="gt_row gt_center" headers="NG">383,2</td>
+<td class="gt_row gt_center" headers="MC">2,64</td>
+<td class="gt_row gt_center" headers="MG">1,93</td>
+<td class="gt_row gt_center" headers="MMG">3,53</td>
+<td class="gt_row gt_center" headers="CG">0,40</td>
+<td class="gt_row gt_center" headers="LG">0,21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G23</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">70,60</td>
+<td class="gt_row gt_center gt_striped" headers="AC">46,00</td>
+<td class="gt_row gt_center gt_striped" headers="NR">2,2</td>
+<td class="gt_row gt_center gt_striped" headers="NC">104,0</td>
+<td class="gt_row gt_center gt_striped" headers="NG">692,4</td>
+<td class="gt_row gt_center gt_striped" headers="MC">4,93</td>
+<td class="gt_row gt_center gt_striped" headers="MG">3,89</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">3,03</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,37</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,18</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G27</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">131,40</td>
+<td class="gt_row gt_center" headers="AC">79,60</td>
+<td class="gt_row gt_center" headers="NR">3,5</td>
+<td class="gt_row gt_center" headers="NC">57,0</td>
+<td class="gt_row gt_center" headers="NG">397,4</td>
+<td class="gt_row gt_center" headers="MC">2,34</td>
+<td class="gt_row gt_center" headers="MG">1,70</td>
+<td class="gt_row gt_center" headers="MMG">3,01</td>
+<td class="gt_row gt_center" headers="CG">0,37</td>
+<td class="gt_row gt_center" headers="LG">0,19</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G28</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">97,00</td>
+<td class="gt_row gt_center gt_striped" headers="AC">64,80</td>
+<td class="gt_row gt_center gt_striped" headers="NR">4,2</td>
+<td class="gt_row gt_center gt_striped" headers="NC">97,8</td>
+<td class="gt_row gt_center gt_striped" headers="NG">783,2</td>
+<td class="gt_row gt_center gt_striped" headers="MC">5,26</td>
+<td class="gt_row gt_center gt_striped" headers="MG">4,09</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">2,36</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,39</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,21</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G29</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">89,60</td>
+<td class="gt_row gt_center" headers="AC">58,40</td>
+<td class="gt_row gt_center" headers="NR">5,6</td>
+<td class="gt_row gt_center" headers="NC">116,4</td>
+<td class="gt_row gt_center" headers="NG">969,2</td>
+<td class="gt_row gt_center" headers="MC">5,64</td>
+<td class="gt_row gt_center" headers="MG">4,84</td>
+<td class="gt_row gt_center" headers="MMG">2,46</td>
+<td class="gt_row gt_center" headers="CG">0,37</td>
+<td class="gt_row gt_center" headers="LG">0,19</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G31</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">71,60</td>
+<td class="gt_row gt_center gt_striped" headers="AC">49,40</td>
+<td class="gt_row gt_center gt_striped" headers="NR">3,2</td>
+<td class="gt_row gt_center gt_striped" headers="NC">35,4</td>
+<td class="gt_row gt_center gt_striped" headers="NG">230,4</td>
+<td class="gt_row gt_center gt_striped" headers="MC">1,52</td>
+<td class="gt_row gt_center gt_striped" headers="MG">1,12</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">5,59</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,38</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G36</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">73,80</td>
+<td class="gt_row gt_center" headers="AC">41,80</td>
+<td class="gt_row gt_center" headers="NR">2,4</td>
+<td class="gt_row gt_center" headers="NC">45,2</td>
+<td class="gt_row gt_center" headers="NG">290,4</td>
+<td class="gt_row gt_center" headers="MC">2,13</td>
+<td class="gt_row gt_center" headers="MG">1,43</td>
+<td class="gt_row gt_center" headers="MMG">3,16</td>
+<td class="gt_row gt_center" headers="CG">0,38</td>
+<td class="gt_row gt_center" headers="LG">0,20</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G37</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">80,10</td>
+<td class="gt_row gt_center gt_striped" headers="AC">49,30</td>
+<td class="gt_row gt_center gt_striped" headers="NR">2,2</td>
+<td class="gt_row gt_center gt_striped" headers="NC">70,8</td>
+<td class="gt_row gt_center gt_striped" headers="NG">514,0</td>
+<td class="gt_row gt_center gt_striped" headers="MC">1,76</td>
+<td class="gt_row gt_center gt_striped" headers="MG">1,69</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">5,01</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,37</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G41</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">80,00</td>
+<td class="gt_row gt_center" headers="AC">49,20</td>
+<td class="gt_row gt_center" headers="NR">4,8</td>
+<td class="gt_row gt_center" headers="NC">38,2</td>
+<td class="gt_row gt_center" headers="NG">308,0</td>
+<td class="gt_row gt_center" headers="MC">1,68</td>
+<td class="gt_row gt_center" headers="MG">1,32</td>
+<td class="gt_row gt_center" headers="MMG">4,16</td>
+<td class="gt_row gt_center" headers="CG">0,38</td>
+<td class="gt_row gt_center" headers="LG">0,20</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G43</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">72,00</td>
+<td class="gt_row gt_center gt_striped" headers="AC">48,00</td>
+<td class="gt_row gt_center gt_striped" headers="NR">1,8</td>
+<td class="gt_row gt_center gt_striped" headers="NC">31,8</td>
+<td class="gt_row gt_center gt_striped" headers="NG">239,0</td>
+<td class="gt_row gt_center gt_striped" headers="MC">1,49</td>
+<td class="gt_row gt_center gt_striped" headers="MG">1,16</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">1,70</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,37</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G48</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">95,20</td>
+<td class="gt_row gt_center" headers="AC">55,40</td>
+<td class="gt_row gt_center" headers="NR">5,0</td>
+<td class="gt_row gt_center" headers="NC">105,0</td>
+<td class="gt_row gt_center" headers="NG">668,0</td>
+<td class="gt_row gt_center" headers="MC">4,61</td>
+<td class="gt_row gt_center" headers="MG">3,32</td>
+<td class="gt_row gt_center" headers="MMG">4,28</td>
+<td class="gt_row gt_center" headers="CG">0,39</td>
+<td class="gt_row gt_center" headers="LG">0,19</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G51</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">101,46</td>
+<td class="gt_row gt_center gt_striped" headers="AC">55,00</td>
+<td class="gt_row gt_center gt_striped" headers="NR">3,4</td>
+<td class="gt_row gt_center gt_striped" headers="NC">101,8</td>
+<td class="gt_row gt_center gt_striped" headers="NG">710,4</td>
+<td class="gt_row gt_center gt_striped" headers="MC">3,03</td>
+<td class="gt_row gt_center gt_striped" headers="MG">2,18</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">4,00</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,39</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,21</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G54</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">79,80</td>
+<td class="gt_row gt_center" headers="AC">47,80</td>
+<td class="gt_row gt_center" headers="NR">5,5</td>
+<td class="gt_row gt_center" headers="NC">108,0</td>
+<td class="gt_row gt_center" headers="NG">721,8</td>
+<td class="gt_row gt_center" headers="MC">2,86</td>
+<td class="gt_row gt_center" headers="MG">2,14</td>
+<td class="gt_row gt_center" headers="MMG">4,55</td>
+<td class="gt_row gt_center" headers="CG">0,39</td>
+<td class="gt_row gt_center" headers="LG">0,21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G55</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">73,90</td>
+<td class="gt_row gt_center gt_striped" headers="AC">51,40</td>
+<td class="gt_row gt_center gt_striped" headers="NR">2,7</td>
+<td class="gt_row gt_center gt_striped" headers="NC">58,4</td>
+<td class="gt_row gt_center gt_striped" headers="NG">443,0</td>
+<td class="gt_row gt_center gt_striped" headers="MC">2,10</td>
+<td class="gt_row gt_center gt_striped" headers="MG">1,47</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">2,64</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,39</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G56</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">77,50</td>
+<td class="gt_row gt_center" headers="AC">40,00</td>
+<td class="gt_row gt_center" headers="NR">3,7</td>
+<td class="gt_row gt_center" headers="NC">184,7</td>
+<td class="gt_row gt_center" headers="NG">1.400,3</td>
+<td class="gt_row gt_center" headers="MC">6,45</td>
+<td class="gt_row gt_center" headers="MG">5,09</td>
+<td class="gt_row gt_center" headers="MMG">5,12</td>
+<td class="gt_row gt_center" headers="CG">0,38</td>
+<td class="gt_row gt_center" headers="LG">0,20</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G57</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">74,76</td>
+<td class="gt_row gt_center gt_striped" headers="AC">45,90</td>
+<td class="gt_row gt_center gt_striped" headers="NR">1,0</td>
+<td class="gt_row gt_center gt_striped" headers="NC">16,8</td>
+<td class="gt_row gt_center gt_striped" headers="NG">89,2</td>
+<td class="gt_row gt_center gt_striped" headers="MC">0,39</td>
+<td class="gt_row gt_center gt_striped" headers="MG">0,26</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">3,98</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,40</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G59</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">80,30</td>
+<td class="gt_row gt_center" headers="AC">52,60</td>
+<td class="gt_row gt_center" headers="NR">1,4</td>
+<td class="gt_row gt_center" headers="NC">30,8</td>
+<td class="gt_row gt_center" headers="NG">207,0</td>
+<td class="gt_row gt_center" headers="MC">1,44</td>
+<td class="gt_row gt_center" headers="MG">0,72</td>
+<td class="gt_row gt_center" headers="MMG">-</td>
+<td class="gt_row gt_center" headers="CG">0,40</td>
+<td class="gt_row gt_center" headers="LG">0,21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G63</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">93,67</td>
+<td class="gt_row gt_center gt_striped" headers="AC">53,00</td>
+<td class="gt_row gt_center gt_striped" headers="NR">4,7</td>
+<td class="gt_row gt_center gt_striped" headers="NC">133,3</td>
+<td class="gt_row gt_center gt_striped" headers="NG">1.042,7</td>
+<td class="gt_row gt_center gt_striped" headers="MC">6,32</td>
+<td class="gt_row gt_center gt_striped" headers="MG">5,01</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">2,45</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,34</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,17</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G64</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">75,33</td>
+<td class="gt_row gt_center" headers="AC">46,33</td>
+<td class="gt_row gt_center" headers="NR">3,7</td>
+<td class="gt_row gt_center" headers="NC">86,0</td>
+<td class="gt_row gt_center" headers="NG">560,0</td>
+<td class="gt_row gt_center" headers="MC">3,80</td>
+<td class="gt_row gt_center" headers="MG">2,87</td>
+<td class="gt_row gt_center" headers="MMG">2,75</td>
+<td class="gt_row gt_center" headers="CG">0,38</td>
+<td class="gt_row gt_center" headers="LG">0,22</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G68</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">129,60</td>
+<td class="gt_row gt_center gt_striped" headers="AC">89,20</td>
+<td class="gt_row gt_center gt_striped" headers="NR">5,0</td>
+<td class="gt_row gt_center gt_striped" headers="NC">45,4</td>
+<td class="gt_row gt_center gt_striped" headers="NG">187,2</td>
+<td class="gt_row gt_center gt_striped" headers="MC">1,09</td>
+<td class="gt_row gt_center gt_striped" headers="MG">0,69</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">3,44</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,36</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,18</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G69</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">79,80</td>
+<td class="gt_row gt_center" headers="AC">46,20</td>
+<td class="gt_row gt_center" headers="NR">3,2</td>
+<td class="gt_row gt_center" headers="NC">77,6</td>
+<td class="gt_row gt_center" headers="NG">530,6</td>
+<td class="gt_row gt_center" headers="MC">3,26</td>
+<td class="gt_row gt_center" headers="MG">2,47</td>
+<td class="gt_row gt_center" headers="MMG">1,86</td>
+<td class="gt_row gt_center" headers="CG">0,38</td>
+<td class="gt_row gt_center" headers="LG">0,19</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G70</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">82,70</td>
+<td class="gt_row gt_center gt_striped" headers="AC">49,10</td>
+<td class="gt_row gt_center gt_striped" headers="NR">2,0</td>
+<td class="gt_row gt_center gt_striped" headers="NC">29,4</td>
+<td class="gt_row gt_center gt_striped" headers="NG">187,0</td>
+<td class="gt_row gt_center gt_striped" headers="MC">1,24</td>
+<td class="gt_row gt_center gt_striped" headers="MG">0,92</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">5,01</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,39</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G71</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">90,60</td>
+<td class="gt_row gt_center" headers="AC">58,40</td>
+<td class="gt_row gt_center" headers="NR">5,0</td>
+<td class="gt_row gt_center" headers="NC">166,0</td>
+<td class="gt_row gt_center" headers="NG">1.076,6</td>
+<td class="gt_row gt_center" headers="MC">6,44</td>
+<td class="gt_row gt_center" headers="MG">4,78</td>
+<td class="gt_row gt_center" headers="MMG">4,33</td>
+<td class="gt_row gt_center" headers="CG">0,39</td>
+<td class="gt_row gt_center" headers="LG">0,19</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G72</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">76,40</td>
+<td class="gt_row gt_center gt_striped" headers="AC">46,40</td>
+<td class="gt_row gt_center gt_striped" headers="NR">1,5</td>
+<td class="gt_row gt_center gt_striped" headers="NC">37,8</td>
+<td class="gt_row gt_center gt_striped" headers="NG">236,4</td>
+<td class="gt_row gt_center gt_striped" headers="MC">1,10</td>
+<td class="gt_row gt_center gt_striped" headers="MG">0,97</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">3,29</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,36</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G73</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">89,80</td>
+<td class="gt_row gt_center" headers="AC">62,60</td>
+<td class="gt_row gt_center" headers="NR">4,6</td>
+<td class="gt_row gt_center" headers="NC">44,6</td>
+<td class="gt_row gt_center" headers="NG">305,4</td>
+<td class="gt_row gt_center" headers="MC">1,59</td>
+<td class="gt_row gt_center" headers="MG">1,22</td>
+<td class="gt_row gt_center" headers="MMG">3,06</td>
+<td class="gt_row gt_center" headers="CG">0,37</td>
+<td class="gt_row gt_center" headers="LG">0,20</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G74</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">89,00</td>
+<td class="gt_row gt_center gt_striped" headers="AC">65,60</td>
+<td class="gt_row gt_center gt_striped" headers="NR">5,0</td>
+<td class="gt_row gt_center gt_striped" headers="NC">39,2</td>
+<td class="gt_row gt_center gt_striped" headers="NG">242,0</td>
+<td class="gt_row gt_center gt_striped" headers="MC">1,46</td>
+<td class="gt_row gt_center gt_striped" headers="MG">0,98</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">2,32</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,38</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G75</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">80,00</td>
+<td class="gt_row gt_center" headers="AC">50,80</td>
+<td class="gt_row gt_center" headers="NR">3,0</td>
+<td class="gt_row gt_center" headers="NC">55,2</td>
+<td class="gt_row gt_center" headers="NG">287,3</td>
+<td class="gt_row gt_center" headers="MC">2,47</td>
+<td class="gt_row gt_center" headers="MG">1,45</td>
+<td class="gt_row gt_center" headers="MMG">2,99</td>
+<td class="gt_row gt_center" headers="CG">0,36</td>
+<td class="gt_row gt_center" headers="LG">0,18</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G77</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">73,60</td>
+<td class="gt_row gt_center gt_striped" headers="AC">46,40</td>
+<td class="gt_row gt_center gt_striped" headers="NR">2,8</td>
+<td class="gt_row gt_center gt_striped" headers="NC">79,8</td>
+<td class="gt_row gt_center gt_striped" headers="NG">587,8</td>
+<td class="gt_row gt_center gt_striped" headers="MC">3,99</td>
+<td class="gt_row gt_center gt_striped" headers="MG">3,11</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">2,52</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,38</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,19</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G78</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">-</td>
+<td class="gt_row gt_center" headers="AC">-</td>
+<td class="gt_row gt_center" headers="NR">-</td>
+<td class="gt_row gt_center" headers="NC">-</td>
+<td class="gt_row gt_center" headers="NG">-</td>
+<td class="gt_row gt_center" headers="MC">-</td>
+<td class="gt_row gt_center" headers="MG">-</td>
+<td class="gt_row gt_center" headers="MMG">-</td>
+<td class="gt_row gt_center" headers="CG">-</td>
+<td class="gt_row gt_center" headers="LG">-</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G79</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">92,80</td>
+<td class="gt_row gt_center gt_striped" headers="AC">49,20</td>
+<td class="gt_row gt_center gt_striped" headers="NR">3,2</td>
+<td class="gt_row gt_center gt_striped" headers="NC">69,8</td>
+<td class="gt_row gt_center gt_striped" headers="NG">496,6</td>
+<td class="gt_row gt_center gt_striped" headers="MC">2,81</td>
+<td class="gt_row gt_center gt_striped" headers="MG">2,07</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">4,27</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,40</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,22</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G82</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">108,60</td>
+<td class="gt_row gt_center" headers="AC">76,00</td>
+<td class="gt_row gt_center" headers="NR">4,8</td>
+<td class="gt_row gt_center" headers="NC">66,2</td>
+<td class="gt_row gt_center" headers="NG">428,2</td>
+<td class="gt_row gt_center" headers="MC">2,63</td>
+<td class="gt_row gt_center" headers="MG">1,83</td>
+<td class="gt_row gt_center" headers="MMG">2,06</td>
+<td class="gt_row gt_center" headers="CG">0,38</td>
+<td class="gt_row gt_center" headers="LG">0,21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G84</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">97,60</td>
+<td class="gt_row gt_center gt_striped" headers="AC">70,00</td>
+<td class="gt_row gt_center gt_striped" headers="NR">11,6</td>
+<td class="gt_row gt_center gt_striped" headers="NC">122,0</td>
+<td class="gt_row gt_center gt_striped" headers="NG">743,8</td>
+<td class="gt_row gt_center gt_striped" headers="MC">1,92</td>
+<td class="gt_row gt_center gt_striped" headers="MG">1,69</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">1,94</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,35</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G86</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">68,00</td>
+<td class="gt_row gt_center" headers="AC">43,00</td>
+<td class="gt_row gt_center" headers="NR">7,0</td>
+<td class="gt_row gt_center" headers="NC">118,0</td>
+<td class="gt_row gt_center" headers="NG">846,0</td>
+<td class="gt_row gt_center" headers="MC">4,54</td>
+<td class="gt_row gt_center" headers="MG">3,41</td>
+<td class="gt_row gt_center" headers="MMG">3,37</td>
+<td class="gt_row gt_center" headers="CG">0,33</td>
+<td class="gt_row gt_center" headers="LG">0,18</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G88</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">79,40</td>
+<td class="gt_row gt_center gt_striped" headers="AC">53,60</td>
+<td class="gt_row gt_center gt_striped" headers="NR">3,2</td>
+<td class="gt_row gt_center gt_striped" headers="NC">95,2</td>
+<td class="gt_row gt_center gt_striped" headers="NG">640,4</td>
+<td class="gt_row gt_center gt_striped" headers="MC">3,87</td>
+<td class="gt_row gt_center gt_striped" headers="MG">3,01</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">3,59</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,38</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G89</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">-</td>
+<td class="gt_row gt_center" headers="AC">-</td>
+<td class="gt_row gt_center" headers="NR">-</td>
+<td class="gt_row gt_center" headers="NC">-</td>
+<td class="gt_row gt_center" headers="NG">-</td>
+<td class="gt_row gt_center" headers="MC">-</td>
+<td class="gt_row gt_center" headers="MG">-</td>
+<td class="gt_row gt_center" headers="MMG">-</td>
+<td class="gt_row gt_center" headers="CG">-</td>
+<td class="gt_row gt_center" headers="LG">-</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G90</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">78,20</td>
+<td class="gt_row gt_center gt_striped" headers="AC">49,00</td>
+<td class="gt_row gt_center gt_striped" headers="NR">1,8</td>
+<td class="gt_row gt_center gt_striped" headers="NC">54,8</td>
+<td class="gt_row gt_center gt_striped" headers="NG">391,6</td>
+<td class="gt_row gt_center gt_striped" headers="MC">2,60</td>
+<td class="gt_row gt_center gt_striped" headers="MG">2,06</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">5,46</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,39</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,19</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G91</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">76,60</td>
+<td class="gt_row gt_center" headers="AC">44,40</td>
+<td class="gt_row gt_center" headers="NR">1,7</td>
+<td class="gt_row gt_center" headers="NC">62,8</td>
+<td class="gt_row gt_center" headers="NG">423,2</td>
+<td class="gt_row gt_center" headers="MC">2,91</td>
+<td class="gt_row gt_center" headers="MG">2,25</td>
+<td class="gt_row gt_center" headers="MMG">3,17</td>
+<td class="gt_row gt_center" headers="CG">0,39</td>
+<td class="gt_row gt_center" headers="LG">0,20</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G92</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">75,50</td>
+<td class="gt_row gt_center gt_striped" headers="AC">42,50</td>
+<td class="gt_row gt_center gt_striped" headers="NR">3,2</td>
+<td class="gt_row gt_center gt_striped" headers="NC">97,0</td>
+<td class="gt_row gt_center gt_striped" headers="NG">689,5</td>
+<td class="gt_row gt_center gt_striped" headers="MC">4,19</td>
+<td class="gt_row gt_center gt_striped" headers="MG">3,25</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">2,97</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,36</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,18</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G93</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">81,80</td>
+<td class="gt_row gt_center" headers="AC">39,80</td>
+<td class="gt_row gt_center" headers="NR">2,3</td>
+<td class="gt_row gt_center" headers="NC">60,0</td>
+<td class="gt_row gt_center" headers="NG">372,8</td>
+<td class="gt_row gt_center" headers="MC">2,36</td>
+<td class="gt_row gt_center" headers="MG">1,45</td>
+<td class="gt_row gt_center" headers="MMG">2,83</td>
+<td class="gt_row gt_center" headers="CG">0,39</td>
+<td class="gt_row gt_center" headers="LG">0,21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G94</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">-</td>
+<td class="gt_row gt_center gt_striped" headers="AC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NR">-</td>
+<td class="gt_row gt_center gt_striped" headers="NC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MC">-</td>
+<td class="gt_row gt_center gt_striped" headers="MG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">-</td>
+<td class="gt_row gt_center gt_striped" headers="CG">-</td>
+<td class="gt_row gt_center gt_striped" headers="LG">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G95</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">-</td>
+<td class="gt_row gt_center" headers="AC">-</td>
+<td class="gt_row gt_center" headers="NR">-</td>
+<td class="gt_row gt_center" headers="NC">-</td>
+<td class="gt_row gt_center" headers="NG">-</td>
+<td class="gt_row gt_center" headers="MC">-</td>
+<td class="gt_row gt_center" headers="MG">-</td>
+<td class="gt_row gt_center" headers="MMG">-</td>
+<td class="gt_row gt_center" headers="CG">-</td>
+<td class="gt_row gt_center" headers="LG">-</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G97</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">99,30</td>
+<td class="gt_row gt_center gt_striped" headers="AC">59,70</td>
+<td class="gt_row gt_center gt_striped" headers="NR">3,2</td>
+<td class="gt_row gt_center gt_striped" headers="NC">41,8</td>
+<td class="gt_row gt_center gt_striped" headers="NG">251,4</td>
+<td class="gt_row gt_center gt_striped" headers="MC">1,38</td>
+<td class="gt_row gt_center gt_striped" headers="MG">0,43</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">5,25</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,39</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,21</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G100</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">96,80</td>
+<td class="gt_row gt_center" headers="AC">61,20</td>
+<td class="gt_row gt_center" headers="NR">4,2</td>
+<td class="gt_row gt_center" headers="NC">47,8</td>
+<td class="gt_row gt_center" headers="NG">319,0</td>
+<td class="gt_row gt_center" headers="MC">2,36</td>
+<td class="gt_row gt_center" headers="MG">1,79</td>
+<td class="gt_row gt_center" headers="MMG">5,92</td>
+<td class="gt_row gt_center" headers="CG">0,43</td>
+<td class="gt_row gt_center" headers="LG">0,22</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G104</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">87,60</td>
+<td class="gt_row gt_center gt_striped" headers="AC">47,80</td>
+<td class="gt_row gt_center gt_striped" headers="NR">4,4</td>
+<td class="gt_row gt_center gt_striped" headers="NC">92,4</td>
+<td class="gt_row gt_center gt_striped" headers="NG">620,0</td>
+<td class="gt_row gt_center gt_striped" headers="MC">4,26</td>
+<td class="gt_row gt_center gt_striped" headers="MG">1,97</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">4,47</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,41</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,23</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G108</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">93,80</td>
+<td class="gt_row gt_center" headers="AC">56,80</td>
+<td class="gt_row gt_center" headers="NR">3,4</td>
+<td class="gt_row gt_center" headers="NC">67,6</td>
+<td class="gt_row gt_center" headers="NG">464,2</td>
+<td class="gt_row gt_center" headers="MC">2,77</td>
+<td class="gt_row gt_center" headers="MG">2,08</td>
+<td class="gt_row gt_center" headers="MMG">2,66</td>
+<td class="gt_row gt_center" headers="CG">0,36</td>
+<td class="gt_row gt_center" headers="LG">0,17</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G110</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">84,60</td>
+<td class="gt_row gt_center gt_striped" headers="AC">59,40</td>
+<td class="gt_row gt_center gt_striped" headers="NR">2,6</td>
+<td class="gt_row gt_center gt_striped" headers="NC">55,0</td>
+<td class="gt_row gt_center gt_striped" headers="NG">414,2</td>
+<td class="gt_row gt_center gt_striped" headers="MC">1,62</td>
+<td class="gt_row gt_center gt_striped" headers="MG">1,15</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">1,80</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,37</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G113</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">102,20</td>
+<td class="gt_row gt_center" headers="AC">63,00</td>
+<td class="gt_row gt_center" headers="NR">4,2</td>
+<td class="gt_row gt_center" headers="NC">53,8</td>
+<td class="gt_row gt_center" headers="NG">290,2</td>
+<td class="gt_row gt_center" headers="MC">1,18</td>
+<td class="gt_row gt_center" headers="MG">0,66</td>
+<td class="gt_row gt_center" headers="MMG">2,86</td>
+<td class="gt_row gt_center" headers="CG">0,38</td>
+<td class="gt_row gt_center" headers="LG">0,20</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G133</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">-</td>
+<td class="gt_row gt_center gt_striped" headers="AC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NR">-</td>
+<td class="gt_row gt_center gt_striped" headers="NC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MC">-</td>
+<td class="gt_row gt_center gt_striped" headers="MG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">-</td>
+<td class="gt_row gt_center gt_striped" headers="CG">-</td>
+<td class="gt_row gt_center gt_striped" headers="LG">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G137</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">16,30</td>
+<td class="gt_row gt_center" headers="AC">71,00</td>
+<td class="gt_row gt_center" headers="NR">10,2</td>
+<td class="gt_row gt_center" headers="NC">-</td>
+<td class="gt_row gt_center" headers="NG">359,4</td>
+<td class="gt_row gt_center" headers="MC">1,58</td>
+<td class="gt_row gt_center" headers="MG">0,85</td>
+<td class="gt_row gt_center" headers="MMG">1,69</td>
+<td class="gt_row gt_center" headers="CG">0,34</td>
+<td class="gt_row gt_center" headers="LG">0,19</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G139</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">140,20</td>
+<td class="gt_row gt_center gt_striped" headers="AC">91,20</td>
+<td class="gt_row gt_center gt_striped" headers="NR">4,6</td>
+<td class="gt_row gt_center gt_striped" headers="NC">52,2</td>
+<td class="gt_row gt_center gt_striped" headers="NG">311,6</td>
+<td class="gt_row gt_center gt_striped" headers="MC">1,69</td>
+<td class="gt_row gt_center gt_striped" headers="MG">1,15</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">2,68</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,38</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G141</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">108,00</td>
+<td class="gt_row gt_center" headers="AC">66,00</td>
+<td class="gt_row gt_center" headers="NR">6,0</td>
+<td class="gt_row gt_center" headers="NC">107,0</td>
+<td class="gt_row gt_center" headers="NG">590,0</td>
+<td class="gt_row gt_center" headers="MC">3,65</td>
+<td class="gt_row gt_center" headers="MG">2,57</td>
+<td class="gt_row gt_center" headers="MMG">4,77</td>
+<td class="gt_row gt_center" headers="CG">0,40</td>
+<td class="gt_row gt_center" headers="LG">0,21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G143</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">-</td>
+<td class="gt_row gt_center gt_striped" headers="AC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NR">-</td>
+<td class="gt_row gt_center gt_striped" headers="NC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MC">-</td>
+<td class="gt_row gt_center gt_striped" headers="MG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">-</td>
+<td class="gt_row gt_center gt_striped" headers="CG">-</td>
+<td class="gt_row gt_center gt_striped" headers="LG">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G144</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">-</td>
+<td class="gt_row gt_center" headers="AC">-</td>
+<td class="gt_row gt_center" headers="NR">-</td>
+<td class="gt_row gt_center" headers="NC">-</td>
+<td class="gt_row gt_center" headers="NG">-</td>
+<td class="gt_row gt_center" headers="MC">-</td>
+<td class="gt_row gt_center" headers="MG">-</td>
+<td class="gt_row gt_center" headers="MMG">-</td>
+<td class="gt_row gt_center" headers="CG">-</td>
+<td class="gt_row gt_center" headers="LG">-</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G145</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">96,40</td>
+<td class="gt_row gt_center gt_striped" headers="AC">56,20</td>
+<td class="gt_row gt_center gt_striped" headers="NR">4,0</td>
+<td class="gt_row gt_center gt_striped" headers="NC">115,2</td>
+<td class="gt_row gt_center gt_striped" headers="NG">787,4</td>
+<td class="gt_row gt_center gt_striped" headers="MC">4,67</td>
+<td class="gt_row gt_center gt_striped" headers="MG">3,53</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">3,06</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,38</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G148</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">82,83</td>
+<td class="gt_row gt_center" headers="AC">42,50</td>
+<td class="gt_row gt_center" headers="NR">2,3</td>
+<td class="gt_row gt_center" headers="NC">109,3</td>
+<td class="gt_row gt_center" headers="NG">670,0</td>
+<td class="gt_row gt_center" headers="MC">3,32</td>
+<td class="gt_row gt_center" headers="MG">2,20</td>
+<td class="gt_row gt_center" headers="MMG">2,62</td>
+<td class="gt_row gt_center" headers="CG">0,39</td>
+<td class="gt_row gt_center" headers="LG">0,21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G149</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">-</td>
+<td class="gt_row gt_center gt_striped" headers="AC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NR">-</td>
+<td class="gt_row gt_center gt_striped" headers="NC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MC">-</td>
+<td class="gt_row gt_center gt_striped" headers="MG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">-</td>
+<td class="gt_row gt_center gt_striped" headers="CG">-</td>
+<td class="gt_row gt_center gt_striped" headers="LG">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G150</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">-</td>
+<td class="gt_row gt_center" headers="AC">-</td>
+<td class="gt_row gt_center" headers="NR">-</td>
+<td class="gt_row gt_center" headers="NC">-</td>
+<td class="gt_row gt_center" headers="NG">-</td>
+<td class="gt_row gt_center" headers="MC">-</td>
+<td class="gt_row gt_center" headers="MG">-</td>
+<td class="gt_row gt_center" headers="MMG">-</td>
+<td class="gt_row gt_center" headers="CG">-</td>
+<td class="gt_row gt_center" headers="LG">-</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G157</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">-</td>
+<td class="gt_row gt_center gt_striped" headers="AC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NR">-</td>
+<td class="gt_row gt_center gt_striped" headers="NC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MC">-</td>
+<td class="gt_row gt_center gt_striped" headers="MG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">-</td>
+<td class="gt_row gt_center gt_striped" headers="CG">-</td>
+<td class="gt_row gt_center gt_striped" headers="LG">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G158</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">84,00</td>
+<td class="gt_row gt_center" headers="AC">50,00</td>
+<td class="gt_row gt_center" headers="NR">10,0</td>
+<td class="gt_row gt_center" headers="NC">192,0</td>
+<td class="gt_row gt_center" headers="NG">896,0</td>
+<td class="gt_row gt_center" headers="MC">3,26</td>
+<td class="gt_row gt_center" headers="MG">2,45</td>
+<td class="gt_row gt_center" headers="MMG">3,72</td>
+<td class="gt_row gt_center" headers="CG">0,39</td>
+<td class="gt_row gt_center" headers="LG">0,21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G159</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">-</td>
+<td class="gt_row gt_center gt_striped" headers="AC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NR">-</td>
+<td class="gt_row gt_center gt_striped" headers="NC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MC">-</td>
+<td class="gt_row gt_center gt_striped" headers="MG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">-</td>
+<td class="gt_row gt_center gt_striped" headers="CG">-</td>
+<td class="gt_row gt_center gt_striped" headers="LG">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G161</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">69,00</td>
+<td class="gt_row gt_center" headers="AC">50,50</td>
+<td class="gt_row gt_center" headers="NR">5,2</td>
+<td class="gt_row gt_center" headers="NC">45,0</td>
+<td class="gt_row gt_center" headers="NG">215,2</td>
+<td class="gt_row gt_center" headers="MC">1,27</td>
+<td class="gt_row gt_center" headers="MG">0,82</td>
+<td class="gt_row gt_center" headers="MMG">2,51</td>
+<td class="gt_row gt_center" headers="CG">0,39</td>
+<td class="gt_row gt_center" headers="LG">0,21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G170</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">75,20</td>
+<td class="gt_row gt_center gt_striped" headers="AC">54,00</td>
+<td class="gt_row gt_center gt_striped" headers="NR">1,4</td>
+<td class="gt_row gt_center gt_striped" headers="NC">28,8</td>
+<td class="gt_row gt_center gt_striped" headers="NG">180,0</td>
+<td class="gt_row gt_center gt_striped" headers="MC">0,72</td>
+<td class="gt_row gt_center gt_striped" headers="MG">0,46</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">3,52</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,40</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G171</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">80,80</td>
+<td class="gt_row gt_center" headers="AC">45,60</td>
+<td class="gt_row gt_center" headers="NR">2,2</td>
+<td class="gt_row gt_center" headers="NC">36,4</td>
+<td class="gt_row gt_center" headers="NG">217,2</td>
+<td class="gt_row gt_center" headers="MC">1,42</td>
+<td class="gt_row gt_center" headers="MG">1,08</td>
+<td class="gt_row gt_center" headers="MMG">4,25</td>
+<td class="gt_row gt_center" headers="CG">0,42</td>
+<td class="gt_row gt_center" headers="LG">0,23</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G174</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">-</td>
+<td class="gt_row gt_center gt_striped" headers="AC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NR">-</td>
+<td class="gt_row gt_center gt_striped" headers="NC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MC">-</td>
+<td class="gt_row gt_center gt_striped" headers="MG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">-</td>
+<td class="gt_row gt_center gt_striped" headers="CG">-</td>
+<td class="gt_row gt_center gt_striped" headers="LG">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G175</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">-</td>
+<td class="gt_row gt_center" headers="AC">-</td>
+<td class="gt_row gt_center" headers="NR">-</td>
+<td class="gt_row gt_center" headers="NC">-</td>
+<td class="gt_row gt_center" headers="NG">-</td>
+<td class="gt_row gt_center" headers="MC">-</td>
+<td class="gt_row gt_center" headers="MG">-</td>
+<td class="gt_row gt_center" headers="MMG">-</td>
+<td class="gt_row gt_center" headers="CG">-</td>
+<td class="gt_row gt_center" headers="LG">-</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G177</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">-</td>
+<td class="gt_row gt_center gt_striped" headers="AC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NR">-</td>
+<td class="gt_row gt_center gt_striped" headers="NC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MC">-</td>
+<td class="gt_row gt_center gt_striped" headers="MG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">-</td>
+<td class="gt_row gt_center gt_striped" headers="CG">-</td>
+<td class="gt_row gt_center gt_striped" headers="LG">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G178</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">86,00</td>
+<td class="gt_row gt_center" headers="AC">48,50</td>
+<td class="gt_row gt_center" headers="NR">5,5</td>
+<td class="gt_row gt_center" headers="NC">82,0</td>
+<td class="gt_row gt_center" headers="NG">282,0</td>
+<td class="gt_row gt_center" headers="MC">1,29</td>
+<td class="gt_row gt_center" headers="MG">0,78</td>
+<td class="gt_row gt_center" headers="MMG">-</td>
+<td class="gt_row gt_center" headers="CG">0,37</td>
+<td class="gt_row gt_center" headers="LG">0,20</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G185</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">-</td>
+<td class="gt_row gt_center gt_striped" headers="AC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NR">-</td>
+<td class="gt_row gt_center gt_striped" headers="NC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MC">-</td>
+<td class="gt_row gt_center gt_striped" headers="MG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">-</td>
+<td class="gt_row gt_center gt_striped" headers="CG">-</td>
+<td class="gt_row gt_center gt_striped" headers="LG">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G192</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">-</td>
+<td class="gt_row gt_center" headers="AC">-</td>
+<td class="gt_row gt_center" headers="NR">-</td>
+<td class="gt_row gt_center" headers="NC">-</td>
+<td class="gt_row gt_center" headers="NG">-</td>
+<td class="gt_row gt_center" headers="MC">-</td>
+<td class="gt_row gt_center" headers="MG">-</td>
+<td class="gt_row gt_center" headers="MMG">-</td>
+<td class="gt_row gt_center" headers="CG">-</td>
+<td class="gt_row gt_center" headers="LG">-</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G195</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">93,67</td>
+<td class="gt_row gt_center gt_striped" headers="AC">49,67</td>
+<td class="gt_row gt_center gt_striped" headers="NR">2,7</td>
+<td class="gt_row gt_center gt_striped" headers="NC">73,3</td>
+<td class="gt_row gt_center gt_striped" headers="NG">470,7</td>
+<td class="gt_row gt_center gt_striped" headers="MC">1,70</td>
+<td class="gt_row gt_center gt_striped" headers="MG">1,25</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">3,76</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,39</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G196</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">86,88</td>
+<td class="gt_row gt_center" headers="AC">45,25</td>
+<td class="gt_row gt_center" headers="NR">4,2</td>
+<td class="gt_row gt_center" headers="NC">85,8</td>
+<td class="gt_row gt_center" headers="NG">518,8</td>
+<td class="gt_row gt_center" headers="MC">2,66</td>
+<td class="gt_row gt_center" headers="MG">1,88</td>
+<td class="gt_row gt_center" headers="MMG">1,79</td>
+<td class="gt_row gt_center" headers="CG">0,39</td>
+<td class="gt_row gt_center" headers="LG">0,21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G197</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center gt_striped" headers="AP">-</td>
+<td class="gt_row gt_center gt_striped" headers="AC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NR">-</td>
+<td class="gt_row gt_center gt_striped" headers="NC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MC">-</td>
+<td class="gt_row gt_center gt_striped" headers="MG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">-</td>
+<td class="gt_row gt_center gt_striped" headers="CG">-</td>
+<td class="gt_row gt_center gt_striped" headers="LG">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G200</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">67,20</td>
+<td class="gt_row gt_center" headers="AC">43,20</td>
+<td class="gt_row gt_center" headers="NR">2,0</td>
+<td class="gt_row gt_center" headers="NC">29,2</td>
+<td class="gt_row gt_center" headers="NG">125,4</td>
+<td class="gt_row gt_center" headers="MC">1,06</td>
+<td class="gt_row gt_center" headers="MG">0,53</td>
+<td class="gt_row gt_center" headers="MMG">2,68</td>
+<td class="gt_row gt_center" headers="CG">0,41</td>
+<td class="gt_row gt_center" headers="LG">0,21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G202</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">-</td>
+<td class="gt_row gt_center gt_striped" headers="AC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NR">-</td>
+<td class="gt_row gt_center gt_striped" headers="NC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MC">-</td>
+<td class="gt_row gt_center gt_striped" headers="MG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">-</td>
+<td class="gt_row gt_center gt_striped" headers="CG">-</td>
+<td class="gt_row gt_center gt_striped" headers="LG">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G203</td>
+<td class="gt_row gt_left" headers="TIPO">DOURADA</td>
+<td class="gt_row gt_center" headers="AP">71,60</td>
+<td class="gt_row gt_center" headers="AC">45,40</td>
+<td class="gt_row gt_center" headers="NR">2,2</td>
+<td class="gt_row gt_center" headers="NC">21,4</td>
+<td class="gt_row gt_center" headers="NG">185,0</td>
+<td class="gt_row gt_center" headers="MC">0,73</td>
+<td class="gt_row gt_center" headers="MG">0,78</td>
+<td class="gt_row gt_center" headers="MMG">2,10</td>
+<td class="gt_row gt_center" headers="CG">0,38</td>
+<td class="gt_row gt_center" headers="LG">0,20</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G205</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">81,40</td>
+<td class="gt_row gt_center gt_striped" headers="AC">51,20</td>
+<td class="gt_row gt_center gt_striped" headers="NR">4,4</td>
+<td class="gt_row gt_center gt_striped" headers="NC">117,2</td>
+<td class="gt_row gt_center gt_striped" headers="NG">608,2</td>
+<td class="gt_row gt_center gt_striped" headers="MC">2,88</td>
+<td class="gt_row gt_center gt_striped" headers="MG">1,69</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">3,31</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,37</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,19</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G206</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">-</td>
+<td class="gt_row gt_center" headers="AC">-</td>
+<td class="gt_row gt_center" headers="NR">-</td>
+<td class="gt_row gt_center" headers="NC">-</td>
+<td class="gt_row gt_center" headers="NG">-</td>
+<td class="gt_row gt_center" headers="MC">-</td>
+<td class="gt_row gt_center" headers="MG">-</td>
+<td class="gt_row gt_center" headers="MMG">-</td>
+<td class="gt_row gt_center" headers="CG">-</td>
+<td class="gt_row gt_center" headers="LG">-</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G211</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">-</td>
+<td class="gt_row gt_center gt_striped" headers="AC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NR">-</td>
+<td class="gt_row gt_center gt_striped" headers="NC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MC">-</td>
+<td class="gt_row gt_center gt_striped" headers="MG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">-</td>
+<td class="gt_row gt_center gt_striped" headers="CG">-</td>
+<td class="gt_row gt_center gt_striped" headers="LG">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G215</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">79,20</td>
+<td class="gt_row gt_center" headers="AC">45,80</td>
+<td class="gt_row gt_center" headers="NR">4,6</td>
+<td class="gt_row gt_center" headers="NC">90,4</td>
+<td class="gt_row gt_center" headers="NG">580,6</td>
+<td class="gt_row gt_center" headers="MC">4,32</td>
+<td class="gt_row gt_center" headers="MG">3,37</td>
+<td class="gt_row gt_center" headers="MMG">4,31</td>
+<td class="gt_row gt_center" headers="CG">0,39</td>
+<td class="gt_row gt_center" headers="LG">0,21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G216</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">83,40</td>
+<td class="gt_row gt_center gt_striped" headers="AC">65,20</td>
+<td class="gt_row gt_center gt_striped" headers="NR">2,4</td>
+<td class="gt_row gt_center gt_striped" headers="NC">93,4</td>
+<td class="gt_row gt_center gt_striped" headers="NG">652,8</td>
+<td class="gt_row gt_center gt_striped" headers="MC">4,77</td>
+<td class="gt_row gt_center gt_striped" headers="MG">3,46</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">1,72</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,40</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,22</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G218</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">84,50</td>
+<td class="gt_row gt_center" headers="AC">57,40</td>
+<td class="gt_row gt_center" headers="NR">5,8</td>
+<td class="gt_row gt_center" headers="NC">126,0</td>
+<td class="gt_row gt_center" headers="NG">884,4</td>
+<td class="gt_row gt_center" headers="MC">5,39</td>
+<td class="gt_row gt_center" headers="MG">4,21</td>
+<td class="gt_row gt_center" headers="MMG">3,33</td>
+<td class="gt_row gt_center" headers="CG">0,38</td>
+<td class="gt_row gt_center" headers="LG">0,20</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G219</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">99,00</td>
+<td class="gt_row gt_center gt_striped" headers="AC">71,20</td>
+<td class="gt_row gt_center gt_striped" headers="NR">4,8</td>
+<td class="gt_row gt_center gt_striped" headers="NC">70,8</td>
+<td class="gt_row gt_center gt_striped" headers="NG">375,0</td>
+<td class="gt_row gt_center gt_striped" headers="MC">2,29</td>
+<td class="gt_row gt_center gt_striped" headers="MG">1,44</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">2,71</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,41</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,22</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G220</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">95,00</td>
+<td class="gt_row gt_center" headers="AC">80,40</td>
+<td class="gt_row gt_center" headers="NR">2,6</td>
+<td class="gt_row gt_center" headers="NC">13,6</td>
+<td class="gt_row gt_center" headers="NG">72,0</td>
+<td class="gt_row gt_center" headers="MC">0,23</td>
+<td class="gt_row gt_center" headers="MG">0,13</td>
+<td class="gt_row gt_center" headers="MMG">3,06</td>
+<td class="gt_row gt_center" headers="CG">0,36</td>
+<td class="gt_row gt_center" headers="LG">0,20</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G221</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">86,00</td>
+<td class="gt_row gt_center gt_striped" headers="AC">53,20</td>
+<td class="gt_row gt_center gt_striped" headers="NR">2,6</td>
+<td class="gt_row gt_center gt_striped" headers="NC">65,0</td>
+<td class="gt_row gt_center gt_striped" headers="NG">362,2</td>
+<td class="gt_row gt_center gt_striped" headers="MC">2,07</td>
+<td class="gt_row gt_center gt_striped" headers="MG">1,45</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">3,19</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,41</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,21</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G222</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">107,00</td>
+<td class="gt_row gt_center" headers="AC">87,40</td>
+<td class="gt_row gt_center" headers="NR">4,2</td>
+<td class="gt_row gt_center" headers="NC">43,6</td>
+<td class="gt_row gt_center" headers="NG">276,8</td>
+<td class="gt_row gt_center" headers="MC">1,20</td>
+<td class="gt_row gt_center" headers="MG">0,86</td>
+<td class="gt_row gt_center" headers="MMG">2,88</td>
+<td class="gt_row gt_center" headers="CG">0,40</td>
+<td class="gt_row gt_center" headers="LG">0,21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G223</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">92,40</td>
+<td class="gt_row gt_center gt_striped" headers="AC">57,40</td>
+<td class="gt_row gt_center gt_striped" headers="NR">6,2</td>
+<td class="gt_row gt_center gt_striped" headers="NC">171,0</td>
+<td class="gt_row gt_center gt_striped" headers="NG">1.135,2</td>
+<td class="gt_row gt_center gt_striped" headers="MC">7,70</td>
+<td class="gt_row gt_center gt_striped" headers="MG">5,83</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">3,75</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,39</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G224</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">91,60</td>
+<td class="gt_row gt_center" headers="AC">57,80</td>
+<td class="gt_row gt_center" headers="NR">2,0</td>
+<td class="gt_row gt_center" headers="NC">68,2</td>
+<td class="gt_row gt_center" headers="NG">471,4</td>
+<td class="gt_row gt_center" headers="MC">2,83</td>
+<td class="gt_row gt_center" headers="MG">2,28</td>
+<td class="gt_row gt_center" headers="MMG">3,59</td>
+<td class="gt_row gt_center" headers="CG">0,36</td>
+<td class="gt_row gt_center" headers="LG">0,19</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G225</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">80,60</td>
+<td class="gt_row gt_center gt_striped" headers="AC">50,40</td>
+<td class="gt_row gt_center gt_striped" headers="NR">3,6</td>
+<td class="gt_row gt_center gt_striped" headers="NC">49,0</td>
+<td class="gt_row gt_center gt_striped" headers="NG">350,4</td>
+<td class="gt_row gt_center gt_striped" headers="MC">2,04</td>
+<td class="gt_row gt_center gt_striped" headers="MG">1,64</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">3,84</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,36</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G226</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">75,20</td>
+<td class="gt_row gt_center" headers="AC">64,80</td>
+<td class="gt_row gt_center" headers="NR">5,4</td>
+<td class="gt_row gt_center" headers="NC">80,0</td>
+<td class="gt_row gt_center" headers="NG">506,0</td>
+<td class="gt_row gt_center" headers="MC">3,44</td>
+<td class="gt_row gt_center" headers="MG">2,69</td>
+<td class="gt_row gt_center" headers="MMG">3,62</td>
+<td class="gt_row gt_center" headers="CG">0,39</td>
+<td class="gt_row gt_center" headers="LG">0,21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G227</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">88,94</td>
+<td class="gt_row gt_center gt_striped" headers="AC">65,70</td>
+<td class="gt_row gt_center gt_striped" headers="NR">5,6</td>
+<td class="gt_row gt_center gt_striped" headers="NC">25,4</td>
+<td class="gt_row gt_center gt_striped" headers="NG">158,6</td>
+<td class="gt_row gt_center gt_striped" headers="MC">0,69</td>
+<td class="gt_row gt_center gt_striped" headers="MG">0,51</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">2,85</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,37</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,21</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G228</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">81,00</td>
+<td class="gt_row gt_center" headers="AC">52,00</td>
+<td class="gt_row gt_center" headers="NR">9,0</td>
+<td class="gt_row gt_center" headers="NC">172,0</td>
+<td class="gt_row gt_center" headers="NG">1.035,0</td>
+<td class="gt_row gt_center" headers="MC">4,37</td>
+<td class="gt_row gt_center" headers="MG">3,34</td>
+<td class="gt_row gt_center" headers="MMG">3,49</td>
+<td class="gt_row gt_center" headers="CG">0,40</td>
+<td class="gt_row gt_center" headers="LG">0,21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G229</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">-</td>
+<td class="gt_row gt_center gt_striped" headers="AC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NR">-</td>
+<td class="gt_row gt_center gt_striped" headers="NC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MC">-</td>
+<td class="gt_row gt_center gt_striped" headers="MG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">-</td>
+<td class="gt_row gt_center gt_striped" headers="CG">-</td>
+<td class="gt_row gt_center gt_striped" headers="LG">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G230</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">-</td>
+<td class="gt_row gt_center" headers="AC">-</td>
+<td class="gt_row gt_center" headers="NR">-</td>
+<td class="gt_row gt_center" headers="NC">-</td>
+<td class="gt_row gt_center" headers="NG">-</td>
+<td class="gt_row gt_center" headers="MC">-</td>
+<td class="gt_row gt_center" headers="MG">-</td>
+<td class="gt_row gt_center" headers="MMG">-</td>
+<td class="gt_row gt_center" headers="CG">-</td>
+<td class="gt_row gt_center" headers="LG">-</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G231</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">75,40</td>
+<td class="gt_row gt_center gt_striped" headers="AC">41,60</td>
+<td class="gt_row gt_center gt_striped" headers="NR">4,6</td>
+<td class="gt_row gt_center gt_striped" headers="NC">79,6</td>
+<td class="gt_row gt_center gt_striped" headers="NG">547,8</td>
+<td class="gt_row gt_center gt_striped" headers="MC">3,28</td>
+<td class="gt_row gt_center gt_striped" headers="MG">2,57</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">2,07</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,37</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,19</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G232</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">-</td>
+<td class="gt_row gt_center" headers="AC">-</td>
+<td class="gt_row gt_center" headers="NR">-</td>
+<td class="gt_row gt_center" headers="NC">-</td>
+<td class="gt_row gt_center" headers="NG">-</td>
+<td class="gt_row gt_center" headers="MC">-</td>
+<td class="gt_row gt_center" headers="MG">-</td>
+<td class="gt_row gt_center" headers="MMG">-</td>
+<td class="gt_row gt_center" headers="CG">-</td>
+<td class="gt_row gt_center" headers="LG">-</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G233</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">77,25</td>
+<td class="gt_row gt_center gt_striped" headers="AC">38,00</td>
+<td class="gt_row gt_center gt_striped" headers="NR">3,0</td>
+<td class="gt_row gt_center gt_striped" headers="NC">107,0</td>
+<td class="gt_row gt_center gt_striped" headers="NG">803,2</td>
+<td class="gt_row gt_center gt_striped" headers="MC">2,66</td>
+<td class="gt_row gt_center gt_striped" headers="MG">1,71</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">2,13</td>
+<td class="gt_row gt_center gt_striped" headers="CG">0,39</td>
+<td class="gt_row gt_center gt_striped" headers="LG">0,21</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="GEN">G234</td>
+<td class="gt_row gt_left" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center" headers="AP">-</td>
+<td class="gt_row gt_center" headers="AC">-</td>
+<td class="gt_row gt_center" headers="NR">-</td>
+<td class="gt_row gt_center" headers="NC">-</td>
+<td class="gt_row gt_center" headers="NG">-</td>
+<td class="gt_row gt_center" headers="MC">-</td>
+<td class="gt_row gt_center" headers="MG">-</td>
+<td class="gt_row gt_center" headers="MMG">-</td>
+<td class="gt_row gt_center" headers="CG">-</td>
+<td class="gt_row gt_center" headers="LG">-</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="GEN">G235</td>
+<td class="gt_row gt_left gt_striped" headers="TIPO">MARROM</td>
+<td class="gt_row gt_center gt_striped" headers="AP">-</td>
+<td class="gt_row gt_center gt_striped" headers="AC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NR">-</td>
+<td class="gt_row gt_center gt_striped" headers="NC">-</td>
+<td class="gt_row gt_center gt_striped" headers="NG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MC">-</td>
+<td class="gt_row gt_center gt_striped" headers="MG">-</td>
+<td class="gt_row gt_center gt_striped" headers="MMG">-</td>
+<td class="gt_row gt_center gt_striped" headers="CG">-</td>
+<td class="gt_row gt_center gt_striped" headers="LG">-</td>
+</tr>
+</tbody><tfoot>
+<tr class="gt_footnotes odd">
+<td colspan="12" class="gt_footnote"><em>Legenda: AP: Altura da Planta; AC: Altura de Cápsula; NR: Número de Ramos; MC: Massa de Cápsulas; MG: Massa de Grãos; NC: Número de Cápsulas; NG: Número de Grãos; CG: Comprimento do Grão; LG: Largura do Grão; MMG: Massa de Mil Grãos.</em></td>
+</tr>
+</tfoot>
+
+</table>
+
+</div>
 </div>
 </div>
 </section>
@@ -353,16 +3348,16 @@ window.Quarto = {
 </ul></li>
 </ul>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gráfico de Dispersão: Altura da Planta vs. Número de Cápsulas</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(resultado_genotipos, <span class="fu">aes</span>(<span class="at">x =</span> AP, <span class="at">y =</span> NC)) <span class="sc">+</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">color =</span> <span class="st">"darkgreen"</span>, <span class="at">size =</span> <span class="fl">2.5</span>) <span class="sc">+</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">TRUE</span>, <span class="at">color =</span> <span class="st">"firebrick"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Relação entre Altura da Planta e Número de Cápsulas por Genótipo"</span>,</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Altura Média da Planta (AP)"</span>,</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Número Médio de Cápsulas (NC)"</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gráfico de Dispersão: Altura da Planta vs. Número de Cápsulas</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(resultado_genotipos, <span class="fu">aes</span>(<span class="at">x =</span> AP, <span class="at">y =</span> NC)) <span class="sc">+</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">color =</span> <span class="st">"darkgreen"</span>, <span class="at">size =</span> <span class="fl">2.5</span>) <span class="sc">+</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">TRUE</span>, <span class="at">color =</span> <span class="st">"firebrick"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Relação entre Altura da Planta e Número de Cápsulas por Genótipo"</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Altura Média da Planta (AP)"</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Número Médio de Cápsulas (NC)"</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
 </div>
@@ -390,27 +3385,27 @@ window.Quarto = {
 <p><strong>Nota:</strong> Como o agrupamento final da Etapa 3 foi feito por genótipo (<code>GEN</code>), precisamos garantir que a coluna <code>TIPO</code> esteja presente em <code>resultado_genotipos</code>. Se não esteve no <code>summarise</code>, podemos recuperá-la associando o tipo ao genótipo a partir da tabela <code>laboratorio</code>.</p>
 </blockquote>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Garantir que a variável TIPO esteja no data frame de genótipos (caso não tenha vindo no summarise)</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="st">"TIPO"</span> <span class="sc">%in%</span> <span class="fu">names</span>(resultado_genotipos)) {</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  tipo_por_gen <span class="ot">&lt;-</span> laboratorio <span class="sc">|&gt;</span> </span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>(GEN, TIPO)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  resultado_genotipos <span class="ot">&lt;-</span> resultado_genotipos <span class="sc">|&gt;</span> </span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(tipo_por_gen, <span class="at">by =</span> <span class="st">"GEN"</span>)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Boxplot + Jitter: Comparação da Altura entre DOURADA e MARROM</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(resultado_genotipos, <span class="fu">aes</span>(<span class="at">x =</span> TIPO, <span class="at">y =</span> AP, <span class="at">fill =</span> TIPO)) <span class="sc">+</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.15</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"DOURADA"</span> <span class="ot">=</span> <span class="st">"gold"</span>, <span class="st">"MARROM"</span> <span class="ot">=</span> <span class="st">"saddlebrown"</span>)) <span class="sc">+</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Comparação da Altura da Planta por Tipo de Linhaça"</span>,</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Tipo de Linhaça"</span>,</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Altura Média da Planta (AP)"</span></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)  </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Garantir que a variável TIPO esteja no data frame de genótipos (caso não tenha vindo no summarise)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="st">"TIPO"</span> <span class="sc">%in%</span> <span class="fu">names</span>(resultado_genotipos)) {</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  tipo_por_gen <span class="ot">&lt;-</span> laboratorio <span class="sc">|&gt;</span> </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>(GEN, TIPO)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  resultado_genotipos <span class="ot">&lt;-</span> resultado_genotipos <span class="sc">|&gt;</span> </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(tipo_por_gen, <span class="at">by =</span> <span class="st">"GEN"</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Boxplot + Jitter: Comparação da Altura entre DOURADA e MARROM</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(resultado_genotipos, <span class="fu">aes</span>(<span class="at">x =</span> TIPO, <span class="at">y =</span> AP, <span class="at">fill =</span> TIPO)) <span class="sc">+</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.15</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"DOURADA"</span> <span class="ot">=</span> <span class="st">"gold"</span>, <span class="st">"MARROM"</span> <span class="ot">=</span> <span class="st">"saddlebrown"</span>)) <span class="sc">+</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Comparação da Altura da Planta por Tipo de Linhaça"</span>,</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Tipo de Linhaça"</span>,</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Altura Média da Planta (AP)"</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)  </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Removed 27 rows containing non-finite outside the scale range
 (`stat_boxplot()`).</code></pre>
@@ -431,14 +3426,14 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="pergunta-3-top-5-genótipos-para-produção-de-grãos-mg-por-tipo-de-linhaça">Pergunta 3: Top 5 Genótipos para Produção de Grãos (<code>MG</code>) por Tipo de Linhaça</h3>
 <p><strong>Melhor opção:</strong> Filtrar os 5 maiores genótipos de cada categoria (<code>DOURADA</code> e <code>MARROM</code>) e apresentar em um gráfico de barras horizontais facetado.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Identificar os Top 5 genótipos de cada TIPO com base na produção de grãos (MG)</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>top5_mg <span class="ot">&lt;-</span> resultado_genotipos <span class="sc">|&gt;</span> </span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(TIPO) <span class="sc">|&gt;</span> </span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">order_by =</span> MG, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizar a tabela dos Top 5 no relatório</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(top5_mg <span class="sc">|&gt;</span> <span class="fu">select</span>(TIPO, GEN, MG))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Identificar os Top 5 genótipos de cada TIPO com base na produção de grãos (MG)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>top5_mg <span class="ot">&lt;-</span> resultado_genotipos <span class="sc">|&gt;</span> </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(TIPO) <span class="sc">|&gt;</span> </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">order_by =</span> MG, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizar a tabela dos Top 5 no relatório</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(top5_mg <span class="sc">|&gt;</span> <span class="fu">select</span>(TIPO, GEN, MG))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 3
    TIPO    GEN      MG
@@ -454,18 +3449,18 @@ window.Quarto = {
  9 MARROM  G63    5.01
 10 MARROM  G12    4.94</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#  Gráfico de barras horizontais para os Top 5 por Tipo</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(top5_mg, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(GEN, MG), <span class="at">y =</span> MG, <span class="at">fill =</span> TIPO)) <span class="sc">+</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> TIPO, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"DOURADA"</span> <span class="ot">=</span> <span class="st">"goldenrod"</span>, <span class="st">"MARROM"</span> <span class="ot">=</span> <span class="st">"sienna"</span>)) <span class="sc">+</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Top 5 Genótipos para Produção de Grãos (MG) por Tipo"</span>,</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Genótipo"</span>,</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Massa Média de Grãos (MG)"</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#  Gráfico de barras horizontais para os Top 5 por Tipo</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(top5_mg, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(GEN, MG), <span class="at">y =</span> MG, <span class="at">fill =</span> TIPO)) <span class="sc">+</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> TIPO, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"DOURADA"</span> <span class="ot">=</span> <span class="st">"goldenrod"</span>, <span class="st">"MARROM"</span> <span class="ot">=</span> <span class="st">"sienna"</span>)) <span class="sc">+</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Top 5 Genótipos para Produção de Grãos (MG) por Tipo"</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Genótipo"</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Massa Média de Grãos (MG)"</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -480,44 +3475,44 @@ window.Quarto = {
 <p><strong>Conceito:</strong> <span class="math inline">\(DS = \text{Média dos Top 5} - \text{Média Geral}\)</span> (calculado separadamente para cada tipo de linhaça na variável <code>MG</code>).</p>
 <p><strong>Melhor opção de gráfico:</strong> Gráfico de barras simples comparando o valor do Diferencial de Seleção entre o tipo <code>DOURADA</code> e <code>MARROM</code>.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcular a Média Geral por TIPO</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>media_geral <span class="ot">&lt;-</span> resultado_genotipos <span class="sc">|&gt;</span> </span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(TIPO) <span class="sc">|&gt;</span> </span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">media_geral_MG =</span> <span class="fu">mean</span>(MG, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcular a Média dos Top 5 por TIPO</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>media_top5 <span class="ot">&lt;-</span> top5_mg <span class="sc">|&gt;</span> </span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(TIPO) <span class="sc">|&gt;</span> </span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">media_top5_MG =</span> <span class="fu">mean</span>(MG, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Unir e calcular o Diferencial de Seleção (DS)</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>diferencial_selecao <span class="ot">&lt;-</span> media_geral <span class="sc">|&gt;</span> </span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(media_top5, <span class="at">by =</span> <span class="st">"TIPO"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DS =</span> media_top5_MG <span class="sc">-</span> media_geral_MG)</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Exibir a tabela com os cálculos no Quarto</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(diferencial_selecao)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcular a Média Geral por TIPO</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>media_geral <span class="ot">&lt;-</span> resultado_genotipos <span class="sc">|&gt;</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(TIPO) <span class="sc">|&gt;</span> </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">media_geral_MG =</span> <span class="fu">mean</span>(MG, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcular a Média dos Top 5 por TIPO</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>media_top5 <span class="ot">&lt;-</span> top5_mg <span class="sc">|&gt;</span> </span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(TIPO) <span class="sc">|&gt;</span> </span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">media_top5_MG =</span> <span class="fu">mean</span>(MG, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Unir e calcular o Diferencial de Seleção (DS)</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>diferencial_selecao <span class="ot">&lt;-</span> media_geral <span class="sc">|&gt;</span> </span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(media_top5, <span class="at">by =</span> <span class="st">"TIPO"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DS =</span> media_top5_MG <span class="sc">-</span> media_geral_MG)</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Exibir a tabela com os cálculos no Quarto</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(diferencial_selecao)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 4
   TIPO    media_geral_MG media_top5_MG    DS
   &lt;chr&gt;            &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;
-1 DOURADA           2.13          4.31  2.18
-2 MARROM            2.31          5.83  3.52</code></pre>
+1 DOURADA           2.28          4.31  2.03
+2 MARROM            2.20          5.83  3.62</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gráfico de Barras do Diferencial de Seleção por Tipo</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(diferencial_selecao, <span class="fu">aes</span>(<span class="at">x =</span> TIPO, <span class="at">y =</span> DS, <span class="at">fill =</span> TIPO)) <span class="sc">+</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">alpha =</span> <span class="fl">0.85</span>) <span class="sc">+</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(DS, <span class="dv">2</span>)), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">fontface =</span> <span class="st">"bold"</span>) <span class="sc">+</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"DOURADA"</span> <span class="ot">=</span> <span class="st">"gold3"</span>, <span class="st">"MARROM"</span> <span class="ot">=</span> <span class="st">"chocolate4"</span>)) <span class="sc">+</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Diferencial de Seleção (DS) para Produção de Grãos (MG)"</span>,</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Diferença entre a média dos Top 5 genótipos e a média geral"</span>,</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Tipo de Linhaça"</span>,</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Diferencial de Seleção (DS)"</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="fu">max</span>(diferencial_selecao<span class="sc">$</span>DS) <span class="sc">*</span> <span class="fl">1.2</span>) <span class="sc">+</span> <span class="co"># Espaço para o texto do valor no topo da barra</span></span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gráfico de Barras do Diferencial de Seleção por Tipo</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(diferencial_selecao, <span class="fu">aes</span>(<span class="at">x =</span> TIPO, <span class="at">y =</span> DS, <span class="at">fill =</span> TIPO)) <span class="sc">+</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">alpha =</span> <span class="fl">0.85</span>) <span class="sc">+</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(DS, <span class="dv">2</span>)), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">fontface =</span> <span class="st">"bold"</span>) <span class="sc">+</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"DOURADA"</span> <span class="ot">=</span> <span class="st">"gold3"</span>, <span class="st">"MARROM"</span> <span class="ot">=</span> <span class="st">"chocolate4"</span>)) <span class="sc">+</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Diferencial de Seleção (DS) para Produção de Grãos (MG)"</span>,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Diferença entre a média dos Top 5 genótipos e a média geral"</span>,</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Tipo de Linhaça"</span>,</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Diferencial de Seleção (DS)"</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="fu">max</span>(diferencial_selecao<span class="sc">$</span>DS) <span class="sc">*</span> <span class="fl">1.2</span>) <span class="sc">+</span> <span class="co"># Espaço para o texto do valor no topo da barra</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">

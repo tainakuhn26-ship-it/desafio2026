@@ -11,9 +11,10 @@ author: "Tainá Caroline Kuhn"
 ```{r setup, message=FALSE, warning=FALSE}
 # Escreva seu código aqui para carregar os pacotes e importar os dados.
 library(tidyverse)
-
-library(rio)
 library(readxl)
+library(gt)
+library(rio)
+
 graos <- import("graos.csv")
 capsulas <- import("capsulas.xlsx")
 laboratorio <- import("laboratorio.xlsx")
@@ -55,9 +56,36 @@ capsulas_resumido <- capsulas |>
 # Unir os dados calculados com o data frame 'laboratorio' e criar o resultado final
 laboratorio <- 
   laboratorio |>
-  mutate(img_id = parse_number(as.character(IMG))) |> 
-  left_join(graos_resumido, by = "img_id") |>
-  left_join(capsulas_resumido, by = "img_id")
+  mutate(IMG_ID = parse_number(as.character(IMG))) |> 
+  select(-IMG) |> 
+  relocate(IMG_ID, TIPO, GEN, PLANTA) |>  # <--- ADICIONE ESTA LINHA AQUI
+  left_join(graos_resumido, by = c("IMG_ID" = "img_id")) |>
+  left_join(capsulas_resumido, by = c("IMG_ID" = "img_id"))
+
+# Exibição de tabela
+laboratorio |> 
+  head(15) |> # Exibe as 15 primeiras plantas para não sobrecarregar a página
+  gt() |> 
+  tab_header(
+    title = md("**Tabela 1.** Consolidação de Dados por Planta")
+  ) |> 
+  fmt_number(
+    columns = c(AP, AC, MC, MG, CG, LG),
+    decimals = 2
+  ) |> 
+  sub_missing(missing_text = "-") |> 
+  opt_stylize(style = 1, color = "gray") |> 
+  # Primeira nota de rodapé
+  tab_footnote(
+    footnote = paste0("Exibindo as primeiras 15 plantas de um total de ", nrow(laboratorio), " observações presentes no conjunto de dados completo.")
+  ) |> 
+  # Segunda nota de rodapé (ficará na linha de baixo)
+  tab_footnote(
+    footnote = md("*Legenda: AP = Altura de Planta; AC = Altura de Cápsula; NR = Número de Ramos; MC = Massa de Cápsula; MG = Massa de Grãos; NG = Número de Grãos; CG = Comprimento de Grão; LG = Largura de Grão; NC = Número de Cápsulas.*")
+  ) |> 
+  tab_options(
+    data_row.padding = px(3) # <--- REDUZ A ALTURA/ESPAÇAMENTO DAS LINHAS
+  )
 
 ```
 
@@ -76,28 +104,104 @@ Com os dados consolidados por planta, o próximo passo é agregar as informaçõ
 
 # Agrupar os dados consolidados por genótipo e calcular a média das variáveis numéricas
 genotipos_resumido <- laboratorio |> 
-  group_by(GEN) |> 
+  group_by(GEN, TIPO) |> 
   summarise(
     across(
-      where(is.numeric) & !any_of("img_id"), 
+      where(is.numeric) & !any_of(c("IMG_ID", "img_id")), 
       \(x) mean(x, na.rm = TRUE)
-    )
+    ),
+    .groups = "drop" # <--- DESFAZ O AGRUPAMENTO PARA NÃO SOBRECARREGAR A MEMÓRIA
   )
 
-# Adicionar a massa de mil grãos (mmg) ao data frame de genótipos
+# Adicionar MMG e reordenar as colunas
 resultado_genotipos <- genotipos_resumido |> 
-  left_join(mmg, by = "GEN") |> 
-  # Converter GEN em fator ordenado numericamente pelo número após o 'G'
+  left_join(mmg |> select(GEN, MMG = mmg), by = "GEN") |> 
   mutate(
     GEN = fct_reorder(GEN, parse_number(GEN))
   ) |> 
-  # Reordenar as linhas do data frame de acordo com o fator criado (G1, G2, ..., G10, etc.)
-  arrange(GEN)
+  arrange(GEN) |> 
+  select(GEN, TIPO, AP, AC, NR, MC, MG, NC, NG, CG, LG, MMG)
 
-# Visualizar o resultado ordenado corretamente
-head(resultado_genotipos)
+# Criação e formatação da tabela gt
+tabela_gt <- resultado_genotipos |> 
+  gt(groupname_col = NULL) |> 
+  
+  tab_header(
+    title = md("**Tabela 2.** Consolidação de Dados por Genótipo")
+  ) |> 
+  
+  cols_label(
+    GEN  = "GEN",
+    TIPO = "TIPO",
+    AP   = "AP",
+    AC   = "AC",
+    NR   = "NR",
+    MC   = "MC",
+    MG   = "MG",
+    NC   = "NC",
+    NG   = "NG",
+    CG   = "CG",
+    LG   = "LG",
+    MMG  = "MMG"
+  ) |> 
+  
+  tab_spanner(label = "(cm)", columns = c(AP, AC)) |> 
+  tab_spanner(label = "(g)", columns = c(MC, MG, MMG)) |> 
+  tab_spanner(label = "(mm)", columns = c(CG, LG)) |> 
+  tab_spanner(label = "(unidades)", columns = c(NR, NC, NG)) |> 
+  
+  # SUB_MISSING PRIMEIRO PARA EVITAR ERRO DE MEMÓRIA NO FMT_NUMBER COM NaN/NA
+  sub_missing(
+    columns = everything(),
+    missing_text = "-"
+  ) |> 
+  
+  fmt_number(
+    columns = c(AP, AC, MC, MG, CG, LG, MMG),
+    decimals = 2,
+    dec_mark = ",",
+    sep_mark = "."
+  ) |> 
+  
+  fmt_number(
+    columns = c(NR, NG, NC),
+    decimals = 1,
+    dec_mark = ",",
+    sep_mark = "."
+  ) |> 
+  
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) |> 
+  cols_align(
+    align = "left",
+    columns = c(GEN, TIPO)
+  ) |> 
+  
+  opt_stylize(style = 1, color = "gray") |> 
+  tab_options(
+    data_row.padding = px(3),
+    table.font.size = px(12),
+    heading.title.font.size = px(14),
+    heading.subtitle.font.size = px(11),
+    column_labels.font.weight = "bold",
+    table_body.hlines.color = "lightgray",
+    table.border.top.color = "black",
+    table.border.top.width = px(2),
+    table.border.bottom.color = "black",
+    table.border.bottom.width = px(2),
+    column_labels.border.top.color = "black",
+    column_labels.border.bottom.color = "black",
+    column_labels.border.bottom.width = px(1.5)
+  ) |> 
+  
+  tab_footnote(
+    footnote = md("*Legenda: AP: Altura da Planta; AC: Altura de Cápsula; NR: Número de Ramos; MC: Massa de Cápsulas; MG: Massa de Grãos; NC: Número de Cápsulas; NG: Número de Grãos; CG: Comprimento do Grão; LG: Largura do Grão; MMG: Massa de Mil Grãos.*")
+  )
 
-
+# Exibir a tabela
+tabela_gt
 ```
 
 ### 4. Exploração e Visualização
