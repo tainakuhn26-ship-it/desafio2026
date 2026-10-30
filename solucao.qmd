@@ -14,6 +14,11 @@ library(tidyverse)
 library(readxl)
 library(gt)
 library(rio)
+library(ggpubr)
+library(ggtext)
+library(ggplot2)
+library(dplyr)
+library(patchwork)
 
 graos <- import("graos.csv")
 capsulas <- import("capsulas.xlsx")
@@ -209,28 +214,245 @@ tabela_gt
 Agora que você tem um dataset final consolidado por genótipo, crie **pelo menos duas visualizações** diferentes para explorar os dados. O objetivo é investigar possíveis relações entre as variáveis e comparar o desempenho dos genótipos.
 
 - Perguntas que você deve responder:
+
   - Como a altura da planta se relaciona com o número de cápsulas?
   - Há indícios de que genótipos do tipo "DOURADA" e "MARROM" diferem em relação à altura de planta?
   - Quais os top 5 genótipos para produção de grãos (MG) de cada tipo de linhaça?
-  - Calcule o diferencial de seleção, ou seja, a diferença da média geral e a média dos top 5 genótipos, para cada tipo de linhaça, representando os valores em um gráfico de barras
+  - Calcule o diferencial de seleção, ou seja, a diferença da média geral e a média dos top 5 genótipos, para cada tipo de linhaça, representando os valores em um gráfico de barras.
+
+- Respostas:
+
+**Como a altura da planta se relaciona com o número de cápsulas?**
 
 ```{r}
 # Gráfico de Dispersão: Altura da Planta vs. Número de Cápsulas
-ggplot(resultado_genotipos, aes(x = AP, y = NC)) +
-  geom_point(alpha = 0.7, color = "darkgreen", size = 2.5) +
-  geom_smooth(method = "lm", se = TRUE, color = "firebrick", linetype = "dashed") +
-  labs(
-    title = "Relação entre Altura da Planta e Número de Cápsulas por Genótipo",
-    x = "Altura Média da Planta (AP)",
-    y = "Número Médio de Cápsulas (NC)"
+
+# Selecionar os dados e remover valores ausentes
+dados_grafico <- resultado_genotipos |>
+  filter(!is.na(AP), !is.na(NC))
+
+# Calcular a correlação de Pearson (r) e o p-valor
+cor_teste <- cor.test(
+  dados_grafico$AP,
+  dados_grafico$NC,
+  method = "pearson"
+)
+
+# Extrair o coeficiente de correlação
+r_val <- round(as.numeric(cor_teste$estimate), 2)
+
+# Extrair o p-valor
+p_val <- format.pval(
+  cor_teste$p.value,
+  digits = 2,
+  eps = 0.001
+)
+
+# Organizar os resultados estatísticos
+texto_estat <- paste0(
+  "r = ", r_val,
+  "\n",
+  "p = ", p_val
+)
+
+# Definir os limites do eixo X
+limite_min <- min(dados_grafico$AP) - 1
+limite_max <- max(dados_grafico$AP) + 1
+
+# Construir o gráfico
+ggplot(dados_grafico, aes(x = AP, y = NC)) +
+  
+  # Pontos do diagrama de dispersão
+  geom_point(
+    alpha = 0.7,
+    color = "darkgreen",
+    size = 2.5
   ) +
-  theme_minimal()
+  
+  # Linha de regressão linear simples
+  geom_smooth(
+    method = "lm",
+    se = TRUE,
+    color = "firebrick",
+    linetype = "dashed",
+    linewidth = 0.8
+  ) +
+  
+  # Inserir correlação e p-valor no gráfico
+  annotate(
+    "label",
+    x = limite_min,
+    y = Inf,
+    label = texto_estat,
+    hjust = 0,
+    vjust = 1.1,
+    fill = "white",
+    color = "black",
+    fontface = "bold",
+    size = 4
+  ) +
+  
+  # Ajustar escala do eixo X
+  scale_x_continuous(
+    limits = c(limite_min, limite_max),
+    expand = c(0, 0)
+  ) +
+  
+  # Título, subtítulo e identificação dos eixos
+  labs(
+    title = "<b>Figura 1.</b> Relação entre Altura da Planta e Número de Cápsulas por Genótipo",
+    x = "Altura Média da Planta - AP (cm)",
+    y = "Número Médio de Cápsulas - NC (unidades)"
+  ) +
+  
+  # Configuração visual
+  theme_bw(base_size = 11) +
+  
+  theme(
+    plot.title = element_markdown(
+      face = "plain",
+      size = 12
+    ),
+    panel.grid.minor = element_blank()
+  )
+```
+
+Existe uma correlação negativa entre a altura da planta e o número de cápsulas, indicando uma tendência de que plantas mais altas apresentem menor número de cápsulas. Entretanto, essa correlação é extremamente fraca, praticamente inexistente (muito próxima de zero), além de não ser estatisticamente significativa. Portanto, não há evidências de uma relação linear entre as duas variáveis nas condições avaliadas. Conforme visualizado no gráfico de dispersão, não existe um padrão, havendo genótipos de alturas semelhantes diferindo expressivamente em relação ao número de cápsulas.
+
+**Investigação de possíveis relações da variável Massa de Grãos (MG) com outras variáveis**
+
+```{r}
+
+# FIGURA 2 - RELAÇÃO DAS DEMAIS CARACTERÍSTICAS AGRONÔMICAS COM A MASSA DE GRÃOS
+
+# Criar função para gerar os gráficos
+criar_grafico <- function(dados, variavel) {
+  
+  # Selecionar observações completas para cada comparação
+  dados_plot <- dados |>
+    select(all_of(variavel), MG) |>
+    filter(!is.na(.data[[variavel]]), !is.na(MG))
+  
+  # Calcular correlação de Pearson (X = variavel, Y = MG)
+  cor_teste <- cor.test(
+    dados_plot[[variavel]],
+    dados_plot$MG,
+    method = "pearson"
+  )
+  
+  # Extrair r e p-valor
+  r_val <- round(as.numeric(cor_teste$estimate), 2)
+  
+  p_val <- format.pval(
+    cor_teste$p.value,
+    digits = 2,
+    eps = 0.001
+  )
+  
+  texto_estat <- paste0(
+    "r = ", r_val,
+    "\n",
+    "p = ", p_val
+  )
+  
+  # Construir o gráfico (Eixo X = variável preditora, Eixo Y = MG)
+  ggplot(
+    dados_plot,
+    aes(x = .data[[variavel]], y = MG)
+  ) +
+    
+    # Pontos
+    geom_point(
+      alpha = 0.7,
+      color = "darkgreen",
+      size = 2
+    ) +
+    
+    # Regressão linear
+    geom_smooth(
+      method = "lm",
+      se = TRUE,
+      color = "firebrick",
+      linetype = "dashed",
+      linewidth = 0.8
+    ) +
+    
+    # Anotação de r e p-valor
+    annotate(
+      "label",
+      x = -Inf,
+      y = Inf,
+      label = texto_estat,
+      hjust = -0.1,
+      vjust = 1.1,
+      fill = "white",
+      color = "black",
+      fontface = "bold",
+      size = 2.5,
+      label.padding = unit(0.1, "lines")
+    ) +
+    
+    # Identificação dos eixos invertida: X recebe a variável e Y recebe a MG
+    labs(
+      x = variavel,
+      y = "MG"
+    ) +
+    
+    # Tema
+    theme_bw(base_size = 10) +
+    
+    theme(
+      panel.grid.minor = element_blank(),
+      axis.title = element_text(size = 10),
+      axis.text = element_text(size = 8)
+    )
+}
 
 
+# Gerar os nove gráficos
+
+g1 <- criar_grafico(resultado_genotipos, "AP")
+g2 <- criar_grafico(resultado_genotipos, "AC")
+g3 <- criar_grafico(resultado_genotipos, "NR")
+g4 <- criar_grafico(resultado_genotipos, "MC")
+g5 <- criar_grafico(resultado_genotipos, "NC")
+g6 <- criar_grafico(resultado_genotipos, "NG")
+g7 <- criar_grafico(resultado_genotipos, "CG")
+g8 <- criar_grafico(resultado_genotipos, "LG")
+g9 <- criar_grafico(resultado_genotipos, "MMG")
+
+
+# Organizar os gráficos em nove painéis
+
+figura2 <- (g1 | g2 | g3) /
+  (g4 | g5 | g6) /
+  (g7 | g8 | g9) +
+  
+  plot_annotation(
+    title = "<b>Figura 2.</b> Relação das Características Agronômicas com a Massa de Grãos"
+  ) &
+  
+  theme(
+    plot.title = ggtext::element_markdown(
+      face = "plain",
+      size = 13,
+      hjust = 0
+    ),
+    plot.caption = element_text(
+      size = 9,
+      hjust = 0,
+      color = "black",
+      margin = margin(t = 12)
+    )
+  )
+
+
+# Exibir a figura
+figura2
 
 ```
 
-## Pergunta 2: Diferença de Altura (`AP`) entre Tipos de Linhaça (`TIPO`: DOURADA vs. MARROM)
+Tendo em vista que um dos objetivos da atividade é a verificação de relação entre variáveis, e que também se objetiva selecionar os genótipos mais produtivos, considerando a massa de grãos (MG), na Figura 2 foram obtidas as correlações entre MG e as demais características analisadas. Conforme os dados obtidos, verifica-se correlação positiva de alta magnitude e estatisticamente significativa entre MG e: MC (massa de cápsulas); NC (número de cápsulas); e NG (número de grãos). Portanto, estas características apresentam potencial para aplicação da seleção indireta visando ao incremento de massa de grãos nos genótipos avaliados.
 
 **Melhor opção de gráfico:** *Boxplot* combinado com os pontos dos dados (*jitter*). O *boxplot* mostra a mediana e quartis de cada tipo, enquanto os pontos revelam a distribuição real dos genótipos.
 
