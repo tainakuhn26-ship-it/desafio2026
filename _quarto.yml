@@ -5,20 +5,18 @@ project:
 website:
   title: "Desafio R 2026"
   navbar:
+    background: primary
     left:
-      - href: index.qmd
-        text: Home
-      - about.qmd
-      - desafio_2026.qmd
-      - solucao.qmd
+      - href: desafio_2026.qmd
+        text: Orientações
+      - href: solucao.qmd
+        text: Solução do Desafio
 
 format:
   html:
-    theme:
-      - cosmo
-      - brand
+    theme: cosmo
     css: styles.css
     toc: true
+    toc-title: "Nesta página"
 
 editor: source
-
